@@ -44,40 +44,62 @@ class user
 class librarian : user // Librarian inherits properties of a user
 {
 
-    void librarianLogin()
-    {
+    public:
+
+        void librarianLogin()
+        {
 
 
-    }
+        }
 
-    void registerBook()
-    {
-        // Insert relevant logic for registering a book
-    }
+        void registerBook()
+        {
+            // Insert relevant logic for registering a book
+        }
 
-    void librarianDashboard()
-    {
-        // Insert logic for student dashboard
-    }
-
-
-
+        void librarianDashboard()
+        {
+            // Insert logic for student dashboard
+        }
 
 };
 
 class student : user // Student inherits properties of a user
 {
-    void studentLogin()
-    {
-        // Insert logic for student login
+    public:
 
-    }
+        void studentLogin()
+        {
+            std::string usernameInput;
+            std::string passwordInput;
 
-    void studentDashboard()
-    {
-        // Insert logic for student dashboard
-    }
+            // Request for relevant details of the individual
+            std::cout << "\nStepwise University - Student Login\n";
+            std::cout << "\nInput your username: " << std::endl;
+            std::cin >> usernameInput;
 
+            std::cout << "\nInput your password: " << std::endl;
+            std::cin >> passwordInput;
+
+            if (usernameInput == username && passwordInput == password)
+            {
+                std::cout << "\nStudent authenticated." << std::endl;
+            }
+            else
+            {
+                std::cout << "\nIncorrect login details, please try again." << std::endl;
+            }
+        }
+
+        void studentDashboard()
+        {
+            // Insert logic for student dashboard
+        }
+
+    private:
+        // Test data for authenticating login
+        std::string username = "joefricker";
+        std::string password = "milkman2092";
 
 };
 
@@ -103,7 +125,7 @@ void login(int validChances)
 
     }
 
-    std::cout << "Stepwise University - Login\n";
+    std::cout << "Stepwise University - Identification\n";
     std::cout << "1. Librarian" << std::endl;
     std::cout << "2. Student" << std::endl;
     std::cout << "\nEnter a corresponding value: " << std::endl;
@@ -112,14 +134,15 @@ void login(int validChances)
 
     if (userInput == "1")
     {
-
-
-
+        system("CLS"); // Clear console
+        librarian staff; // Create a new session of the class
+        staff.librarianLogin(); // Engage the method
     }
     else if (userInput == "2")
     {
-
-
+        system("CLS"); // Clear console
+        student person; // Create a new session of the class
+        person.studentLogin(); // Engage the method
     }
     else
     {
