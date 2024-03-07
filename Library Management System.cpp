@@ -4,19 +4,13 @@
 // Prerequisite libraries
 #include <iostream>
 #include <string>
+#include <vector>
 
 
 
 // Defines all users (i.e. students and librarians)
 class user
 {
-    // Key attributes of a user
-    std::string name;
-    std::string surname;
-    int age;
-    std::string gender;
-    std::string email;
-
     void borrowBook()
     {
         // Insert logic for borrowing a book
@@ -37,6 +31,14 @@ class user
 
 
     }
+
+    protected:
+        // Key attributes of a user
+        std::string name;
+        std::string surname;
+        int age;
+        std::string gender;
+        std::string email;
 };
 
 
@@ -45,11 +47,47 @@ class librarian : user // Librarian inherits properties of a user
 {
 
     public:
-
-        void librarianLogin()
+        void librarianLogin(int remainingChances)
         {
 
+            if (remainingChances < 3) // Check if user has less than 3 chances
+            {
+                if (remainingChances == 0) // Nested selection statement to check if the chances has reached zero.
+                {
+                    std::cout << "Too many incorrect attempts, console will now terminate." << std::endl;
+                    exit(0); // Termiante the console
+                }
 
+                else
+                {
+                    std::cout << "Remaining chances: " << remainingChances << std::endl;
+
+                }
+
+            }
+
+            std::string usernameInput;
+            std::string passwordInput;
+
+            // Request for relevant details of the individual
+            std::cout << "Stepwise University - Staff Login\n";
+            std::cout << "\nInput your username: " << std::endl;
+            std::cin >> usernameInput;
+
+            std::cout << "\nInput your password: " << std::endl;
+            std::cin >> passwordInput;
+
+            if (usernameInput == username && passwordInput == password)
+            {
+                std::cout << "\nIndividual authenticated." << std::endl;
+                librarianDashboard();
+                
+            }
+            else
+            {
+                std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
+                librarianLogin(remainingChances - 1); // Reduce number of chances per recursion to avoid brute force
+            }
         }
 
         void registerBook()
@@ -59,8 +97,31 @@ class librarian : user // Librarian inherits properties of a user
 
         void librarianDashboard()
         {
-            // Insert logic for student dashboard
+            int userChoice;
+
+            std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Log out" }; // Vector of string options
+            // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
+
+            int numCount = 1;
+            std::cout << "Stepwise University - Staff/Librarian Dashboard\n";
+            std::cout << "\n"; // Spacing
+
+            for (int i = 0; i < dashboardOptions.size(); i++) // Iterate through the vector values, displaying them to the staff member
+            {
+                std::cout << numCount << ". " << dashboardOptions[i] << std::endl;
+                numCount++;
+            }
+
+            std::cout << "\n"; // Spacing
+            std::cout << "Enter a corresponding value: " << std::endl;
+            std::cin >> userChoice;
         }
+
+    protected:
+        // Test data for authenticating login
+        std::string username = "Eucladian";
+        std::string password = "euclade1";
+
 
 };
 
@@ -68,13 +129,29 @@ class student : user // Student inherits properties of a user
 {
     public:
 
-        void studentLogin()
+        void studentLogin(int remainingChances)
         {
+            if (remainingChances < 3) // Check if user has less than 3 chances
+            {
+                if (remainingChances == 0) // Nested selection statement to check if the chances has reached zero.
+                {
+                    std::cout << "Too many incorrect attempts, console will now terminate." << std::endl;
+                    exit(0); // Termiante the console
+                }
+
+                else
+                {
+                    std::cout << "Remaining chances: " << remainingChances << std::endl;
+
+                }
+
+            }
+
             std::string usernameInput;
             std::string passwordInput;
 
             // Request for relevant details of the individual
-            std::cout << "\nStepwise University - Student Login\n";
+            std::cout << "Stepwise University - Student Login\n";
             std::cout << "\nInput your username: " << std::endl;
             std::cin >> usernameInput;
 
@@ -87,7 +164,8 @@ class student : user // Student inherits properties of a user
             }
             else
             {
-                std::cout << "\nIncorrect login details, please try again." << std::endl;
+                std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
+                studentLogin(remainingChances - 1); // Reduce number of chances per recursion to avoid brute force
             }
         }
 
@@ -98,8 +176,8 @@ class student : user // Student inherits properties of a user
 
     private:
         // Test data for authenticating login
-        std::string username = "joefricker";
-        std::string password = "milkman2092";
+        std::string username = "Eucladian";
+        std::string password = "euclade1";
 
 };
 
@@ -108,6 +186,7 @@ class student : user // Student inherits properties of a user
 void login(int validChances)
 {
      std::string userInput;
+     int remainingChances = 3;
 
     if (validChances < 3) // Check if user has less than 3 chances
     {
@@ -136,13 +215,13 @@ void login(int validChances)
     {
         system("CLS"); // Clear console
         librarian staff; // Create a new session of the class
-        staff.librarianLogin(); // Engage the method
+        staff.librarianLogin(remainingChances); // Engage the method
     }
     else if (userInput == "2")
     {
         system("CLS"); // Clear console
         student person; // Create a new session of the class
-        person.studentLogin(); // Engage the method
+        person.studentLogin(remainingChances); // Engage the method
     }
     else
     {
