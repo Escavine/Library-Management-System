@@ -115,6 +115,33 @@ class librarian : user // Librarian inherits properties of a user
             std::cout << "\n"; // Spacing
             std::cout << "Enter a corresponding value: " << std::endl;
             std::cin >> userChoice;
+
+            // Selection case as switch case will break the program since string isn't supported (average C# user)
+
+            if (userChoice == 1)
+            {
+
+
+            }
+            else if (userChoice == 2)
+            {
+
+
+
+            }
+            else if (userChoice == 3)
+            {
+
+
+
+            }
+            else if (userChoice == 4)
+            {
+                // int remainingChances = 3;
+                // std::cout << "Logging user out of session." << std::endl;
+                // login(remainingChances);  
+            }
+
         }
 
     protected:
