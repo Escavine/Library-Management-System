@@ -1,9 +1,11 @@
-// Library Management System.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Library Management System 
 
 
 // Prerequisite libraries
 #include <iostream>
 #include <string>
+
+
 
 // Defines all users (i.e. students and librarians)
 class user
@@ -39,20 +41,85 @@ class user
 
 
 
-class librarian : user // Usage of inheritance for the librarian as it is a user
+class librarian : user // Librarian inherits properties of a user
 {
+
+    void librarianLogin()
+    {
+
+
+    }
+
+    void registerBook()
+    {
+        // Insert relevant logic for registering a book
+    }
+
+    void librarianDashboard()
+    {
+        // Insert logic for student dashboard
+    }
+
+
+
+
+};
+
+class student : user // Student inherits properties of a user
+{
+    void studentLogin()
+    {
+        // Insert logic for student login
+
+    }
+
+    void studentDashboard()
+    {
+        // Insert logic for student dashboard
+    }
 
 
 };
 
 
 
-// Engaging the start of the program
-int main()
+void login()
 {
-    
+    int userInput;
+
     std::cout << "Stepwise University - Login\n";
     std::cout << "1. Librarian" << std::endl;
     std::cout << "2. Student" << std::endl;
     std::cout << "\nEnter a corresponding value: " << std::endl;
+    std::cin >> userInput; // Accept the corresponding value
+
+    switch (userInput)
+    {
+    case 1:
+
+        break;
+
+    case 2:
+
+        break;
+
+    default:
+        std::cout << "Incorrect value, please try again." << std::endl;
+        system("CLS");
+
+
+
+    }
+
+
+
+}
+
+
+
+// Driver code
+int main()
+{
+    login();
+
 }
