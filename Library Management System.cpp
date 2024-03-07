@@ -83,9 +83,25 @@ class student : user // Student inherits properties of a user
 
 
 
-void login()
+void login(int validChances)
 {
-    int userInput;
+     std::string userInput;
+
+    if (validChances < 3) // Check if user has less than 3 chances
+    {
+        if (validChances == 0) // Nested selection statement to check if the chances has reached zero.
+        {
+            std::cout << "Too many incorrect attempts, console will now terminate." << std::endl;
+            exit(0); // Termiante the console
+        }
+
+        else
+        {
+            std::cout << "Remaining chances: " << validChances << std::endl;
+
+        }
+
+    }
 
     std::cout << "Stepwise University - Login\n";
     std::cout << "1. Librarian" << std::endl;
@@ -93,25 +109,23 @@ void login()
     std::cout << "\nEnter a corresponding value: " << std::endl;
     std::cin >> userInput; // Accept the corresponding value
 
-    switch (userInput)
+
+    if (userInput == "1")
     {
-    case 1:
-
-        break;
-
-    case 2:
-
-        break;
-
-    default:
-        std::cout << "Incorrect value, please try again." << std::endl;
-        system("CLS");
 
 
 
     }
+    else if (userInput == "2")
+    {
 
 
+    }
+    else
+    {
+        std::cout << "\nIncorrect value, please try again.\n" << std::endl;
+        login(validChances - 1); // Recurse
+    }
 
 }
 
@@ -120,6 +134,8 @@ void login()
 // Driver code
 int main()
 {
-    login();
+    int validChances = 3;
+
+    login(validChances);
 
 }
