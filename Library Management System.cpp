@@ -25,7 +25,7 @@ class user
 
         int borrowBook()
         {
-
+            std::cout << "Stepwise University: Borrowing a Book\n";
             // Insert logic for borrowing a book
 
             // Open CSV file to load the books that are available in the library
@@ -38,7 +38,7 @@ class user
                 return 1; // Indicate error, should this occur
             }
 
-            std::string line; // string for iterating file
+            std::string line; // string for iterating file2
 
             while (std::getline(file, line))
             {
@@ -62,8 +62,6 @@ class user
                 return 0;
 
             }
-            
-
 
         }
 
@@ -312,8 +310,6 @@ class librarian : user // Librarian inherits properties of a user
             {
                 staff.borrowBook();
 
-
-
             }
             else if (userChoice == "3")
             {
@@ -356,7 +352,7 @@ class student : user // Student inherits properties of a user
 {
     public:
 
-        void studentLogin(int remainingChances)
+        void studentLogin(int remainingChances, student person)
         {
             if (remainingChances < 3) // Check if user has less than 3 chances
             {
@@ -390,18 +386,68 @@ class student : user // Student inherits properties of a user
                 std::cout << "\nStudent authenticated." << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
                 system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-                studentDashboard(); // Lead user to their dashboard
+                studentDashboard(person); // Lead user to their dashboard
             }
             else
             {
                 std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
-                studentLogin(remainingChances - 1); // Reduce number of chances per recursion to avoid brute force
+                studentLogin(remainingChances - 1, person); // Reduce number of chances per recursion to avoid brute force
             }
         }
 
-        void studentDashboard()
+        void studentDashboard(student person)
         {
-            // Insert logic for student dashboard
+            std::string userChoice;
+
+            std::vector <std::string> dashboardOptions = { "Borrow a book", "Return a book", "Log out" }; // Vector of string options
+            // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
+
+            int numCount = 1;
+            std::cout << "Stepwise University: Staff/Librarian Dashboard\n";
+            std::cout << "\n"; // Spacing
+            std::cout << "Welcome " << name << std::endl;
+            std::cout << "\n"; // Spacing
+
+            for (int i = 0; i < dashboardOptions.size(); i++) // Iterate through the vector values, displaying them to the staff member
+            {
+                std::cout << numCount << ". " << dashboardOptions[i] << std::endl;
+                numCount++;
+            }
+
+            std::cout << "\n"; // Spacing
+            std::cout << "Enter a corresponding value: " << std::endl;
+            std::cin >> userChoice;
+
+
+            // Selection case as switch case will break the program since string isn't supported (average C# user)
+
+            if (userChoice == "1")
+            {
+                person.borrowBook();
+
+            }
+            else if (userChoice == "2")
+            {
+
+            }
+            else if (userChoice == "3")
+            {
+
+            }
+            else if (userChoice == "4")
+            {
+                // int remainingChances = 3;
+                // std::cout << "Logging user out of session." << std::endl;
+                // login(remainingChances);  
+            }
+            else
+            {
+                std::cout << "\nInvalid input, please try again." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
+                system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
+                studentDashboard(person); // Recurse 
+            }
+
         }
 
     private:
@@ -451,7 +497,7 @@ void login(int validChances)
     {
         system("CLS"); // Clear console
         student person; // Create a new session of the class
-        person.studentLogin(remainingChances); // Engage the method
+        person.studentLogin(remainingChances, person); // Engage the method
     }
     else
     {
