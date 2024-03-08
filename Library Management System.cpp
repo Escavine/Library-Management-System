@@ -8,6 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <regex>
+#include <fstream>
 
 
 // Defines all users (i.e. students and librarians)
@@ -148,7 +149,7 @@ class librarian : user // Librarian inherits properties of a user
 
             // Add all relevant input validation mediums
             std::cout << "\nEnter the book title: " << std::endl;
-            std::cin >> bookTitle;
+            std::getline(std::cin, bookTitle);
             staff.clearInputBuffer();
 
 
@@ -157,7 +158,7 @@ class librarian : user // Librarian inherits properties of a user
             staff.clearInputBuffer();
 
             std::cout << "\nEnter the name of the book publisher: " << std::endl;
-            std::cin >> bookPublisher;
+            std::getline(std::cin, bookPublisher);
             staff.clearInputBuffer();
 
             std::cout << "\nEnter the number of books that have been released: " << std::endl;
@@ -191,6 +192,7 @@ class librarian : user // Librarian inherits properties of a user
 
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before displaying the details
             system("CLS");
+
             // Output all relevant information regarding the registered book
             std::cout << "Stepwise University: Book Registered\n";
             std::cout << "Book Details\n";
@@ -205,18 +207,35 @@ class librarian : user // Librarian inherits properties of a user
 
             int size = relevantSubjects.size();
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++) // Iterate through the relevant subjects to display to user
             {
                 std::cout << "* " << relevantSubjects[i] << "\n" << std::endl;
 
             }
             
             // Create a CSV file to store the books
+            createCSV(bookID, bookTitle, yearOfBook, bookPublisher, numberOfBooks, numberOfAvailableBooks);
 
+            // Redirect user back to dashboard
             std::cout << "\nYou will now be redirected to the dashboard..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(10)); // Wait five seconds
             system("CLS"); // Clear the console
             staff.librarianDashboard(staff); // Redirect the user
+
+        }
+
+        void createCSV(std::string bookID, std::string bookTitle, int yearOfBook, std::string bookPublisher, int numberOfBooks, int numberOfAvailableBooks) // This function will create a .CSV file for the registered book
+        {
+            std::ofstream file("books.csv"); // Create a file called books.csv
+
+            // Store the necessary details of the book into the file
+            file << "\nBook ID: " << bookID << std::endl;
+            file << "\nBook Title: " << bookTitle << std::endl;
+            file << "\nYear of release: " << yearOfBook << std::endl;
+            file << "\nBook Publisher: " << bookPublisher << std::endl;
+            file << "\nNumber of worldwide books released: " << numberOfBooks << std::endl;
+            file << "\nNumber of available copies of the book in the library: " << numberOfAvailableBooks << std::endl;
+            file.close(); // Close the file
 
         }
 
