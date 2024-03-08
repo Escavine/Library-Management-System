@@ -23,34 +23,43 @@ class user
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
         }
 
-        void borrowBook()
+        int borrowBook()
         {
-            std::fstream fin; // File pointer
 
             // Insert logic for borrowing a book
 
             // Open CSV file to load the books that are available in the library
             
-            fin.open("books.csv"); // Open the .CSV file
+            std::ifstream file("books.csv"); // Open the .CSV file
 
-            std::vector<std::string> row; // Read the data from the file as vector
-            std::string line, word, temp; // string for iterating file
-
-            while (fin >> temp)
+            if (!file.is_open())
             {
-                row.clear();
+                std::cerr << "Error opening file!" << std::endl;
+                return 1; // Indicate error, should this occur
+            }
 
-                // Extract first line of the file
-                std::getline(fin, line);
+            std::string line; // string for iterating file
 
+            while (std::getline(file, line))
+            {
                 // Create stringstream from line
-                std::stringstream s(line);
+                std::stringstream ss(line);
+                std::string field; // Defining a singel field for the CSV
+                std::vector<std::string> fields; // Defining fields for the CSV 
 
-                while (std::getline(s, word, ","))
+                while (std::getline(ss, field, ',')) // Parse each field of the line
                 {
-                    row.push_back({ word, std::vector<std::string> {} })
-
+                    fields.push_back(field); // Append per field to the vector
                 }
+
+                for (const auto& f : fields)
+                {
+                    std::cout << f << " ";
+                }
+                std::cout << std::endl;
+
+                file.close();
+                return 0;
 
             }
             
