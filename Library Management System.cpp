@@ -71,7 +71,7 @@ class librarian : user // Librarian inherits properties of a user
             std::string passwordInput;
 
             // Request for relevant details of the individual
-            std::cout << "Stepwise University - Staff Login\n";
+            std::cout << "Stepwise University: Staff Login\n";
             std::cout << "\nInput your username: " << std::endl;
             std::cin >> usernameInput;
 
@@ -95,7 +95,60 @@ class librarian : user // Librarian inherits properties of a user
 
         void registerBook()
         {
-            // Insert relevant logic for registering a book
+            // Relevant parameters for book registering
+            std::string subjectRegisterer; // Will register each subject that will then be appended to the vector
+            std::string bookID;
+            std::string bookTitle;
+            std::vector <std::string> relevantSubjects = {}; // A vector that will contain all necessary subjects of the books registered
+            std::string bookPublisher;
+
+            int numOfRelevantSubjects;
+            int numCount = 1; // Will keep track of the loop
+            int yearOfBook;
+            int numberOfBooks;
+            int numberOfAvailableBooks;
+
+            bool relevantSubjectInput = false;
+
+            // Add input validation measures to prevent trash input
+            std::cout << "Stepwise University: Registering a book\n";
+
+            std::cout << "\nEnter the book ID: " << std::endl;
+            std::getline(std::cin, bookID);
+
+            std::cout << "\nEnter the book title: " << std::endl;
+            std::getline(std::cin, bookTitle);
+
+            std::cout << "\nEnter the year of book published: " << std::endl;
+            std::cin >> yearOfBook;
+
+            std::cout << "\nEnter the name of the book publisher: " << std::endl;
+            std::cin >> bookPublisher;
+
+            std::cout << "\nEnter the number of books that have been released: " << std::endl;
+            std::cin >> numberOfBooks;
+
+            std::cout << "\nEnter the number of available books in the library: " << std::endl;
+            std::cin >> numberOfAvailableBooks;
+
+            std::cout << "\nHow many relevant subjects are there for this given book?" << std::endl;
+            std::cin >> numOfRelevantSubjects; // Register this value
+
+
+            // Do-while loop for appending relevant subjects for the book
+            do
+            {
+                for (int i = 0; i < numOfRelevantSubjects; i++)
+                {
+                    std::cout << "Enter the relevant subject " << "(" << "Subject " << numCount << "): " << std::endl;
+                    std::cin >> subjectRegisterer; // Register user input
+                    relevantSubjects.push_back(subjectRegisterer); // Register the subject
+                    numCount++;
+                }
+
+
+
+            } while (relevantSubjectInput = false);
         }
 
         void librarianDashboard()
@@ -125,28 +178,10 @@ class librarian : user // Librarian inherits properties of a user
 
             if (userChoice == "1")
             {
-                // Relevant parameters for book registering
-                std::string bookID;
-                std::string bookTitle;
-                int yearOfBook;
-                std::string bookPublisher;
-                int numberOfBooks;
-                int numberOfAvailableBooks;
-                std::vector <std::string> relevantSubjects = {}; // A vector that will contain all necessary subjects of the books registered
-                std::cout << "Stepwise University: Registering a book\n";
-
-                std::cout << "Enter the book ID: " << std::endl;
-                std::getline(std::cin, bookID);
-
-                std::cout << "Enter the book title: " << std::endl;
-                std::getline(std::cin, bookTitle);
-
-                std::cout << "Enter the year of book published: " 
-
-
-
-
-
+                std::cout << "\nYou will now be lead to register a book on the system" << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before registering a book
+                system("CLS"); // Clear the console for cleanliness
+                registerBook(); // Lead user to the function
             }
             else if (userChoice == "2")
             {
