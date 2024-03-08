@@ -9,6 +9,7 @@
 #include <thread>
 #include <regex>
 #include <fstream>
+#include <sstream>
 
 
 // Defines all users (i.e. students and librarians)
@@ -22,16 +23,40 @@ class user
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
         }
 
-    private:
         void borrowBook()
         {
+            std::fstream fin; // File pointer
+
             // Insert logic for borrowing a book
 
             // Open CSV file to load the books that are available in the library
+            
+            fin.open("books.csv"); // Open the .CSV file
+
+            std::vector<std::string> row; // Read the data from the file as vector
+            std::string line, word, temp; // string for iterating file
+
+            while (fin >> temp)
+            {
+                row.clear();
+
+                // Extract first line of the file
+                std::getline(fin, line);
+
+                // Create stringstream from line
+                std::stringstream s(line);
+
+                while (std::getline(s, word, ","))
+                {
+                    row.push_back({ word, std::vector<std::string> {} })
+
+                }
+
+            }
+            
 
 
         }
-
 
         void returnBook()
         {
@@ -276,6 +301,7 @@ class librarian : user // Librarian inherits properties of a user
             }
             else if (userChoice == "2")
             {
+                staff.borrowBook();
 
 
 
