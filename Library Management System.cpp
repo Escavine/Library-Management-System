@@ -23,45 +23,83 @@ class user
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
         }
 
-        int borrowBook()
+        void borrowBook(user individual) // This is dynamic and can be a teacher/student
         {
+            std::string userInput;
+
             std::cout << "Stepwise University: Borrowing a Book\n";
-            // Insert logic for borrowing a book
+            std::cout << "Current Books" << std::endl;
+
+
+
+            std::cout << "\nEnter the Book ID for the book you'd like to borrow: " << std::endl;
+            std::cin >> userInput; // Register user input
+
+
+            // std::string embeddingCSV = userInput + ".csv"; // Used as comparision marker
+            // std::cout << "\n" << embeddingCSV << std::endl; // Debugging
 
             // Open CSV file to load the books that are available in the library
-            
-            std::ifstream file("books.csv"); // Open the .CSV file
+            std::ifstream file(userInput + ".csv"); // Open the .CSV file, which contains the given book based on the book ID
 
             if (!file.is_open())
             {
-                std::cerr << "Error opening file!" << std::endl;
-                return 1; // Indicate error, should this occur
+                std::cerr << "Cannot find book." << std::endl;
             }
-
-            std::string line; // string for iterating file2
-
-            while (std::getline(file, line))
+            
+            else
             {
-                // Create stringstream from line
-                std::stringstream ss(line);
-                std::string field; // Defining a singel field for the CSV
-                std::vector<std::string> fields; // Defining fields for the CSV 
+                int confirmUserBorrow;
 
-                while (std::getline(ss, field, ',')) // Parse each field of the line
+                std::cout << "Found book!" << std::endl;
+
+                // Logic for displaying book information
+
+                std::string line; // string for iterating file2
+
+                while (std::getline(file, line))
                 {
-                    fields.push_back(field); // Append per field to the vector
+                    // Create stringstream from line
+                    std::stringstream ss(line);
+                    std::string field; // Defining a singel field for the CSV
+                    std::vector<std::string> fields; // Defining fields for the CSV 
+
+                    while (std::getline(ss, field, ',')) // Parse each field of the line
+                    {
+                        fields.push_back(field); // Append per field to the vector
+                    }
+
+                    for (const auto& f : fields)
+                    {
+                        std::cout << f << " ";
+                    }
+                    std::cout << std::endl;
                 }
 
-                for (const auto& f : fields)
-                {
-                    std::cout << f << " ";
-                }
-                std::cout << std::endl;
+                std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for no)" << std::endl;
+                std::cin >> confirmUserBorrow;
 
-                file.close();
-                return 0;
+                if (confirmUserBorrow == 1)
+                {
+                    // Create a borrow record session, embedding the individauls name and the ID for the book
+                    std::ofstream userBorrowRecord(name + userInput);
+                    // testing
+                    userBorrowRecord << individual.name << "Book Borrowed: " << std::endl;
+                    userBorrowRecord << "\nBookID: " << line << std::endl;
+                 
+
+
+                }
+                else
+                {
+                    std::cout << "Would you like to perhaps borrow another book, or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard)" << std::endl;
+                    
+                }
 
             }
+
+
+            file.close();
 
         }
 
@@ -258,7 +296,8 @@ class librarian : user // Librarian inherits properties of a user
 
         void createCSV(std::string bookID, std::string bookTitle, int yearOfBook, std::string bookPublisher, int numberOfBooks, int numberOfAvailableBooks) // This function will create a .CSV file for the registered book
         {
-            std::ofstream file("books.csv"); // Create a file called books.csv
+            std::string fileName = bookID; 
+            std::ofstream file(fileName + ".csv"); // Create a file called books.csv
 
             // Store the necessary details of the book into the file
             file << "\nBook ID: " << bookID << std::endl;
@@ -308,7 +347,10 @@ class librarian : user // Librarian inherits properties of a user
             }
             else if (userChoice == "2")
             {
-                staff.borrowBook();
+                std::cout << "\nBorrowing a book option has been selected. Redirecting user..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
+                system("CLS"); // Clear console
+                staff.borrowBook(staff);
 
             }
             else if (userChoice == "3")
@@ -423,7 +465,10 @@ class student : user // Student inherits properties of a user
 
             if (userChoice == "1")
             {
-                person.borrowBook();
+                std::cout << "\nBorrowing a book option has been selected. Redirecting user..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
+                system("CLS"); // Clear console
+                person.borrowBook(person);
 
             }
             else if (userChoice == "2")
@@ -480,7 +525,7 @@ void login(int validChances)
 
     }
 
-    std::cout << "Stepwise University - Identification\n";
+    std::cout << "Stepwise University: Identification\n";
     std::cout << "1. Librarian" << std::endl;
     std::cout << "2. Student" << std::endl;
     std::cout << "\nEnter a corresponding value: " << std::endl;
