@@ -12,26 +12,35 @@
 // Defines all users (i.e. students and librarians)
 class user
 {
-    void borrowBook()
-    {
-        // Insert logic for borrowing a book
+
+    public:
+        void clearInputBuffer()
+        {
+            std::cin.clear(); // Clear the input
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
+        }
+
+    private:
+        void borrowBook()
+        {
+            // Insert logic for borrowing a book
 
 
-    }
+        }
 
 
-    void returnBook()
-    {
-        // Insert logic for returning a book
+        void returnBook()
+        {
+            // Insert logic for returning a book
 
-    }
+        }
 
-    void calculatingFine()
-    {
-        // Insert logic for calculating a fine based on how long the book as taken for it to be returned
+        void calculatingFine()
+        {
+            // Insert logic for calculating a fine based on how long the book as taken for it to be returned
 
 
-    }
+        }
 
     protected:
         // Key attributes of a user
@@ -48,7 +57,7 @@ class librarian : user // Librarian inherits properties of a user
 {
 
     public:
-        void librarianLogin(int remainingChances)
+        void librarianLogin(int remainingChances, librarian staff)
         {
 
             if (remainingChances < 3) // Check if user has less than 3 chances
@@ -83,23 +92,23 @@ class librarian : user // Librarian inherits properties of a user
                 std::cout << "\nIndividual authenticated." << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
                 system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-                librarianDashboard();
+                librarianDashboard(staff);
                 
             }
             else
             {
                 std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
-                librarianLogin(remainingChances - 1); // Reduce number of chances per recursion to avoid brute force
+                librarianLogin(remainingChances - 1, staff); // Reduce number of chances per recursion to avoid brute force
             }
         }
 
-        void registerBook()
+        void registerBook(librarian staff)
         {
             // Relevant parameters for book registering
             std::string subjectRegisterer; // Will register each subject that will then be appended to the vector
             std::string bookID;
             std::string bookTitle;
-            std::vector <std::string> relevantSubjects = {}; // A vector that will contain all necessary subjects of the books registered
+            std::vector <std::string> relevantSubjects; // A vector that will contain all necessary subjects of the books registered
             std::string bookPublisher;
 
             int numOfRelevantSubjects;
@@ -114,25 +123,34 @@ class librarian : user // Librarian inherits properties of a user
             std::cout << "Stepwise University: Registering a book\n";
 
             std::cout << "\nEnter the book ID: " << std::endl;
-            std::getline(std::cin, bookID);
+            std::cin >> bookID; // Add a structure for the book ID's that need to be followed
+            staff.clearInputBuffer();
 
             std::cout << "\nEnter the book title: " << std::endl;
-            std::getline(std::cin, bookTitle);
+            std::cin >> bookTitle;
+            staff.clearInputBuffer();
+
 
             std::cout << "\nEnter the year of book published: " << std::endl;
             std::cin >> yearOfBook;
+            staff.clearInputBuffer();
 
             std::cout << "\nEnter the name of the book publisher: " << std::endl;
             std::cin >> bookPublisher;
+            staff.clearInputBuffer();
 
             std::cout << "\nEnter the number of books that have been released: " << std::endl;
             std::cin >> numberOfBooks;
+            staff.clearInputBuffer();
 
             std::cout << "\nEnter the number of available books in the library: " << std::endl;
             std::cin >> numberOfAvailableBooks;
+            staff.clearInputBuffer();
 
             std::cout << "\nHow many relevant subjects are there for this given book?" << std::endl;
             std::cin >> numOfRelevantSubjects; // Register this value
+            staff.clearInputBuffer();
+
 
 
             // Do-while loop for appending relevant subjects for the book
@@ -140,7 +158,7 @@ class librarian : user // Librarian inherits properties of a user
             {
                 for (int i = 0; i < numOfRelevantSubjects; i++)
                 {
-                    std::cout << "Enter the relevant subject " << "(" << "Subject " << numCount << "): " << std::endl;
+                    std::cout << "\nEnter the relevant subject " << "(" << "Subject " << numCount << "): " << std::endl;
                     std::cin >> subjectRegisterer; // Register user input
                     relevantSubjects.push_back(subjectRegisterer); // Register the subject
                     numCount++;
@@ -149,9 +167,39 @@ class librarian : user // Librarian inherits properties of a user
 
 
             } while (relevantSubjectInput = false);
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before displaying the details
+            system("CLS");
+            // Output all relevant information regarding the registered book
+            std::cout << "Stepwise University: Book Registered\n";
+            std::cout << "Book Details\n";
+            std::cout << "\nBook ID: " << bookID << std::endl;
+            std::cout << "\nBook Title: " << bookTitle << std::endl;
+            std::cout << "\nYear of release: " << yearOfBook << std::endl;
+            std::cout << "\nBook Publisher: " << bookPublisher << std::endl;
+            std::cout << "\nNumber of worldwide books released: " << numberOfBooks << std::endl;
+            std::cout << "\nNumber of available copies of the book in the library: " << numberOfAvailableBooks << std::endl;
+            
+            std::cout << "\nNumber of relevant subjects: \n" << std::endl;
+
+            int size = relevantSubjects.size();
+
+            for (int i = 0; i < size; i++)
+            {
+                std::cout << "* " << relevantSubjects[i] << "\n" << std::endl;
+
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(5)); // Wait five seconds
+            std::cout << "\nYou will now be redirected to the dashboard..." << std::endl;
+            system("CLS"); // Clear the console
+            staff.librarianDashboard(staff); // Redirect the user
+
         }
 
-        void librarianDashboard()
+
+
+        void librarianDashboard(librarian staff)
         {
             std::string userChoice;
 
@@ -172,7 +220,8 @@ class librarian : user // Librarian inherits properties of a user
 
             std::cout << "\n"; // Spacing
             std::cout << "Enter a corresponding value: " << std::endl;
-            std::getline(std::cin, userChoice);
+            std::cin >> userChoice;
+
 
             // Selection case as switch case will break the program since string isn't supported (average C# user)
 
@@ -181,7 +230,7 @@ class librarian : user // Librarian inherits properties of a user
                 std::cout << "\nYou will now be lead to register a book on the system" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before registering a book
                 system("CLS"); // Clear the console for cleanliness
-                registerBook(); // Lead user to the function
+                registerBook(staff); // Lead user to the function
             }
             else if (userChoice == "2")
             {
@@ -206,7 +255,7 @@ class librarian : user // Librarian inherits properties of a user
                 std::cout << "\nInvalid input, please try again." << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
                 system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-                librarianDashboard(); // Recurse 
+                librarianDashboard(staff); // Recurse 
             }
 
         }
@@ -313,7 +362,7 @@ void login(int validChances)
     {
         system("CLS"); // Clear console
         librarian staff; // Create a new session of the class
-        staff.librarianLogin(remainingChances); // Engage the method
+        staff.librarianLogin(remainingChances, staff); // Engage the method
     }
     else if (userInput == "2")
     {
