@@ -7,6 +7,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <regex>
 
 
 // Defines all users (i.e. students and librarians)
@@ -25,6 +26,8 @@ class user
         {
             // Insert logic for borrowing a book
 
+            // Open CSV file to load the books that are available in the library
+
 
         }
 
@@ -32,6 +35,8 @@ class user
         void returnBook()
         {
             // Insert logic for returning a book
+
+            // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
 
         }
 
@@ -122,10 +127,26 @@ class librarian : user // Librarian inherits properties of a user
             // Add input validation measures to prevent trash input
             std::cout << "Stepwise University: Registering a book\n";
 
-            std::cout << "\nEnter the book ID: " << std::endl;
+            std::cout << "\nEnter the book ID (format: xxx-xxx-xxx): ";
             std::cin >> bookID; // Add a structure for the book ID's that need to be followed
-            staff.clearInputBuffer();
 
+            bool checkPattern = bookIDPattern(bookID);
+
+            if (!checkPattern)
+            {
+                std::cout << "\nIncorrect book ID structure, please try again." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read
+                system("CLS");
+                staff.clearInputBuffer();
+                registerBook(staff); // Recurse
+            }
+            else
+            {
+                staff.clearInputBuffer();
+            }
+
+
+            // Add all relevant input validation mediums
             std::cout << "\nEnter the book title: " << std::endl;
             std::cin >> bookTitle;
             staff.clearInputBuffer();
@@ -189,9 +210,11 @@ class librarian : user // Librarian inherits properties of a user
                 std::cout << "* " << relevantSubjects[i] << "\n" << std::endl;
 
             }
+            
+            // Create a CSV file to store the books
 
-            std::this_thread::sleep_for(std::chrono::seconds(5)); // Wait five seconds
             std::cout << "\nYou will now be redirected to the dashboard..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(10)); // Wait five seconds
             system("CLS"); // Clear the console
             staff.librarianDashboard(staff); // Redirect the user
 
@@ -258,6 +281,12 @@ class librarian : user // Librarian inherits properties of a user
                 librarianDashboard(staff); // Recurse 
             }
 
+        }
+
+        bool bookIDPattern(const std::string& bookID)
+        {
+            std::regex pattern("\\d{3}-\\d{3}-\\d{3}"); // Defining pattern
+            return std::regex_match(bookID, pattern); // Return true, if there's match in design
         }
 
     protected:
