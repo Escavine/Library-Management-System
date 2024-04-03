@@ -15,7 +15,6 @@
 // Defines all users (i.e. students and librarians)
 class user
 {
-
     public:
         void clearInputBuffer()
         {
@@ -82,14 +81,12 @@ class user
                 if (confirmUserBorrow == 1)
                 {
                     // Create a borrow record session, embedding the individauls name and the ID for the book
-                    std::ofstream userBorrowRecord(name + userInput);
+                    std::ofstream userBorrowRecord(name + userInput + ".txt");
 
                     // Testing
-                    userBorrowRecord << individual.name << "Book Borrowed: " << std::endl;
+                    userBorrowRecord << individual.name << "Book Borrowed: " << line << std::endl;
                     userBorrowRecord << "\nBookID: " << line << std::endl;
                  
-
-
                 }
                 else
                 {
@@ -99,9 +96,7 @@ class user
 
             }
 
-
             file.close();
-
         }
 
         void returnBook()
