@@ -54,7 +54,7 @@ class user
 
                 // Logic for displaying book information
 
-                std::string line; // string for iterating file2
+                std::string line; // string for iterating file
 
                 while (std::getline(file, line))
                 {
@@ -78,18 +78,26 @@ class user
                 std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no')" << std::endl;
                 std::cin >> confirmUserBorrow;
 
-                // This vector will be used to append the following items from the '.csv' file to the '.txt' file within the given order
-                std::vector<std::string> orderOfCollection = { "Book ID:", "Book Title: ", "Year of Release: ", "Quantity Borrowed: ", "Date Borrowed: " };
 
                 if (confirmUserBorrow == 1)
                 {
+                    time_t localTime; // Retrieve local time
+                    time(&localTime);
+
+                    char dt[100]; // Store the following information from 'strftime' into 'dt'
+                    
+                    // Format the date and time into string format using strftime
+                    strftime(dt, sizeof(dt), "%Y-%M-%D %H:%M-%S", localtime(&localTime));
+
+
+                    file.clear(); // Clear the previous errors with the file
+                    file.seekg(0); // Reset file pointer to the beginnning
+
                     // Create a borrow record session, embedding the individauls name and the ID for the book
-                    std::ofstream userBorrowRecord(name + userInput + ".txt");
+                    std::ofstream outputFile(name + userInput + ".txt"); // Open a text file for writing
 
-                    // Testing
-                    userBorrowRecord << individual.name << "Book Borrowed: " << line << std::endl;
-                    userBorrowRecord << "\nBookID: " << line << std::endl;
 
+                    std::string line;
                     while (std::getline(file, line))
                     {
                         // Create stringstream from line
@@ -101,14 +109,22 @@ class user
                         {
                             fields.push_back(field); // Append per field to the vector
                         }
-
+                        
+                        // Append the following data values into the '.txt' file (TESTING)
+                        
                         for (const auto& f : fields)
                         {
-                            std::cout << f << " ";
+                            outputFile << f << " ";
                         }
-                        std::cout << std::endl;
+                       
+                        outputFile << std::endl;
                     }
-                 
+                    
+                    // Extra, relevant information
+                    outputFile << "\nDate Borrowed: " << dt << std::endl;
+
+                    std::cout << "\nBook borrowed successfully!" << std::endl;
+
                 }
                 else
                 {
