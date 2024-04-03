@@ -89,7 +89,7 @@ class user
                     std::cout << std::endl;
                 }
 
-                std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no')" << std::endl;
+                std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no'): ";
                 std::cin >> confirmUserBorrow;
 
 
@@ -232,7 +232,7 @@ class librarian : user // Librarian inherits properties of a user
             Book book; // Create an instance of a book
             int numCount = 1; // Will keep track of the loop
             std::string subjectRegisterer;
-            std::string numOfRelevantSubjects;
+            int numOfRelevantSubjects;
 
             bool relevantSubjectInput = false;
 
@@ -285,11 +285,10 @@ class librarian : user // Librarian inherits properties of a user
             staff.clearInputBuffer();
 
 
-
             // Do-while loop for appending relevant subjects for the book
             do
             {
-                for (int i = 0; i < numOfRelevantSubjects.size(); ++i)
+                for (int i = 0; i < numOfRelevantSubjects; ++i)
                 {
                     std::cout << "\nEnter the relevant subject " << "(" << "Subject " << numCount << "): " << std::endl;
                     std::cin >> subjectRegisterer; // Register user input
@@ -594,7 +593,5 @@ void login(int validChances)
 int main()
 {
     int validChances = 3;
-
     login(validChances);
-
 }
