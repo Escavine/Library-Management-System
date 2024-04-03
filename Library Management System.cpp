@@ -11,6 +11,20 @@
 #include <fstream>
 #include <sstream>
 
+// Structure for a book
+struct Book {
+    std::string bookID;
+    std::string bookTitle;
+    std::string bookPublisher;
+    std::string dateBorrowed;
+
+    std::vector<std::string> relevantSubjects;
+
+    int numberOfReleases;
+    int yearOfRelease;
+    int remainingBooks;
+    int quantityBorrowed;
+};
 
 // Defines all users (i.e. students and librarians)
 class user
@@ -94,7 +108,7 @@ class user
                     file.seekg(0); // Reset file pointer to the beginnning
 
                     // Create a borrow record session, embedding the individauls name and the ID for the book
-                    std::ofstream outputFile(name + userInput + ".txt"); // Open a text file for writing
+                    std::ofstream outputFile(individual.name + userInput + ".txt"); // Open a text file for writing
 
 
                     std::string line;
@@ -111,7 +125,9 @@ class user
                         }
                         
                         // Append the following data values into the '.txt' file (TESTING)
-                        
+                      
+                        // for (int i = 0; i < )
+
                         for (const auto& f : fields)
                         {
                             outputFile << f << " ";
@@ -165,7 +181,6 @@ class user
 
 class librarian : user // Librarian inherits properties of a user
 {
-
     public:
         void librarianLogin(int remainingChances, librarian staff)
         {
@@ -214,18 +229,10 @@ class librarian : user // Librarian inherits properties of a user
 
         void registerBook(librarian staff)
         {
-            // Relevant parameters for book registering
-            std::string subjectRegisterer; // Will register each subject that will then be appended to the vector
-            std::string bookID;
-            std::string bookTitle;
-            std::vector <std::string> relevantSubjects; // A vector that will contain all necessary subjects of the books registered
-            std::string bookPublisher;
-
-            int numOfRelevantSubjects;
+            Book book; // Create an instance of a book
             int numCount = 1; // Will keep track of the loop
-            int yearOfBook;
-            int numberOfBooks;
-            int numberOfAvailableBooks;
+            std::string subjectRegisterer;
+            std::string numOfRelevantSubjects;
 
             bool relevantSubjectInput = false;
 
@@ -233,9 +240,9 @@ class librarian : user // Librarian inherits properties of a user
             std::cout << "Stepwise University: Registering a book\n";
 
             std::cout << "\nEnter the book ID (format: xxx-xxx-xxx): ";
-            std::cin >> bookID; // Add a structure for the book ID's that need to be followed
+            std::cin >> book.bookID; // Add a structure for the book ID's that need to be followed
 
-            bool checkPattern = bookIDPattern(bookID);
+            bool checkPattern = bookIDPattern(book.bookID);
 
             if (!checkPattern)
             {
@@ -252,28 +259,28 @@ class librarian : user // Librarian inherits properties of a user
 
 
             // Add all relevant input validation mediums
-            std::cout << "\nEnter the book title: " << std::endl;
-            std::getline(std::cin, bookTitle);
+            std::cout << "\nEnter the book title: ";
+            std::getline(std::cin, book.bookTitle);
             staff.clearInputBuffer();
 
 
-            std::cout << "\nEnter the year of book published: " << std::endl;
-            std::cin >> yearOfBook;
+            std::cout << "\nEnter the year of book published: ";
+            std::cin >> book.yearOfRelease;
             staff.clearInputBuffer();
 
-            std::cout << "\nEnter the name of the book publisher: " << std::endl;
-            std::getline(std::cin, bookPublisher);
+            std::cout << "\nEnter the name of the book publisher: ";
+            std::getline(std::cin, book.bookPublisher);
             staff.clearInputBuffer();
 
-            std::cout << "\nEnter the number of books that have been released: " << std::endl;
-            std::cin >> numberOfBooks;
+            std::cout << "\nEnter the number of books that have been released: ";
+            std::cin >> book.numberOfReleases;
             staff.clearInputBuffer();
 
-            std::cout << "\nEnter the number of available books in the library: " << std::endl;
-            std::cin >> numberOfAvailableBooks;
+            std::cout << "\nEnter the number of available books in the library: ";
+            std::cin >> book.remainingBooks;
             staff.clearInputBuffer();
 
-            std::cout << "\nHow many relevant subjects are there for this given book?" << std::endl;
+            std::cout << "\nHow many relevant subjects are there for this given book?: ";
             std::cin >> numOfRelevantSubjects; // Register this value
             staff.clearInputBuffer();
 
@@ -282,15 +289,13 @@ class librarian : user // Librarian inherits properties of a user
             // Do-while loop for appending relevant subjects for the book
             do
             {
-                for (int i = 0; i < numOfRelevantSubjects; i++)
+                for (int i = 0; i < numOfRelevantSubjects.size(); ++i)
                 {
                     std::cout << "\nEnter the relevant subject " << "(" << "Subject " << numCount << "): " << std::endl;
                     std::cin >> subjectRegisterer; // Register user input
-                    relevantSubjects.push_back(subjectRegisterer); // Register the subject
+                    book.relevantSubjects.push_back(subjectRegisterer); // Register the subject
                     numCount++;
                 }
-
-
 
             } while (relevantSubjectInput = false);
 
@@ -300,25 +305,24 @@ class librarian : user // Librarian inherits properties of a user
             // Output all relevant information regarding the registered book
             std::cout << "Stepwise University: Book Registered\n";
             std::cout << "Book Details\n";
-            std::cout << "\nBook ID: " << bookID << std::endl;
-            std::cout << "\nBook Title: " << bookTitle << std::endl;
-            std::cout << "\nYear of release: " << yearOfBook << std::endl;
-            std::cout << "\nBook Publisher: " << bookPublisher << std::endl;
-            std::cout << "\nNumber of worldwide books released: " << numberOfBooks << std::endl;
-            std::cout << "\nNumber of available copies of the book in the library: " << numberOfAvailableBooks << std::endl;
-            
+            std::cout << "\nBook ID: " << book.bookID << std::endl;
+            std::cout << "\nBook Title: " << book.bookTitle << std::endl;
+            std::cout << "\nYear of release: " << book.yearOfRelease << std::endl;
+            std::cout << "\nBook Publisher: " << book.bookPublisher << std::endl;
+            std::cout << "\nNumber of worldwide books released: " << book.numberOfReleases << std::endl;
+            std::cout << "\nNumber of available copies of the book in the library: " << book.remainingBooks << std::endl;
+      
             std::cout << "\nNumber of relevant subjects: \n" << std::endl;
-
-            int size = relevantSubjects.size();
+            int size = book.relevantSubjects.size();
 
             for (int i = 0; i < size; i++) // Iterate through the relevant subjects to display to user
             {
-                std::cout << "* " << relevantSubjects[i] << "\n" << std::endl;
+                std::cout << "* " << book.relevantSubjects[i] << "\n" << std::endl;
 
             }
             
             // Create a CSV file to store the books
-            createCSV(bookID, bookTitle, yearOfBook, bookPublisher, numberOfBooks, numberOfAvailableBooks);
+            createCSV(book);
 
             // Redirect user back to dashboard
             std::cout << "\nYou will now be redirected to the dashboard..." << std::endl;
@@ -328,23 +332,21 @@ class librarian : user // Librarian inherits properties of a user
 
         }
 
-        void createCSV(std::string bookID, std::string bookTitle, int yearOfBook, std::string bookPublisher, int numberOfBooks, int numberOfAvailableBooks) // This function will create a .CSV file for the registered book
+        void createCSV(Book book) // This function will create a .CSV file for the registered book
         {
-            std::string fileName = bookID; 
+            std::string fileName = book.bookID; 
             std::ofstream file(fileName + ".csv"); // Create a file called books.csv
 
             // Store the necessary details of the book into the file
-            file << "\nBook ID: " << bookID << std::endl;
-            file << "\nBook Title: " << bookTitle << std::endl;
-            file << "\nYear of release: " << yearOfBook << std::endl;
-            file << "\nBook Publisher: " << bookPublisher << std::endl;
-            file << "\nNumber of worldwide books released: " << numberOfBooks << std::endl;
-            file << "\nNumber of available copies of the book in the library: " << numberOfAvailableBooks << std::endl;
+            file << "\nBook ID: " << book.bookID << std::endl;
+            file << "\nBook Title: " << book.bookTitle << std::endl;
+            file << "\nYear of release: " << book.yearOfRelease << std::endl;
+            file << "\nBook Publisher: " << book.bookPublisher << std::endl;
+            file << "\nNumber of worldwide books released: " << book.numberOfReleases << std::endl;
+            file << "\nNumber of available copies of the book in the library: " << book.remainingBooks << std::endl;
             file.close(); // Close the file
 
         }
-
-
 
         void librarianDashboard(librarian staff)
         {
