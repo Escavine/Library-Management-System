@@ -78,6 +78,9 @@ class user
                 std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no')" << std::endl;
                 std::cin >> confirmUserBorrow;
 
+                // This vector will be used to append the following items from the '.csv' file to the '.txt' file within the given order
+                std::vector<std::string> orderOfCollection = { "Book ID:", "Book Title: ", "Year of Release: ", "Quantity Borrowed: ", "Date Borrowed: " };
+
                 if (confirmUserBorrow == 1)
                 {
                     // Create a borrow record session, embedding the individauls name and the ID for the book
@@ -86,6 +89,25 @@ class user
                     // Testing
                     userBorrowRecord << individual.name << "Book Borrowed: " << line << std::endl;
                     userBorrowRecord << "\nBookID: " << line << std::endl;
+
+                    while (std::getline(file, line))
+                    {
+                        // Create stringstream from line
+                        std::stringstream ss(line);
+                        std::string field; // Defining a single field for the CSV
+                        std::vector<std::string> fields; // Defining fields for the CSV 
+
+                        while (std::getline(ss, field, ',')) // Parse each field of the line
+                        {
+                            fields.push_back(field); // Append per field to the vector
+                        }
+
+                        for (const auto& f : fields)
+                        {
+                            std::cout << f << " ";
+                        }
+                        std::cout << std::endl;
+                    }
                  
                 }
                 else
