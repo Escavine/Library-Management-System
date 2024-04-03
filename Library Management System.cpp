@@ -44,14 +44,14 @@ class user
 
             if (!file.is_open())
             {
-                std::cerr << "Cannot find book." << std::endl;
+                std::cerr << "\nCannot find book." << std::endl;
             }
             
             else
             {
                 int confirmUserBorrow;
 
-                std::cout << "Found book!" << std::endl;
+                std::cout << "\nFound book!" << std::endl;
 
                 // Logic for displaying book information
 
@@ -61,7 +61,7 @@ class user
                 {
                     // Create stringstream from line
                     std::stringstream ss(line);
-                    std::string field; // Defining a singel field for the CSV
+                    std::string field; // Defining a single field for the CSV
                     std::vector<std::string> fields; // Defining fields for the CSV 
 
                     while (std::getline(ss, field, ',')) // Parse each field of the line
@@ -76,14 +76,15 @@ class user
                     std::cout << std::endl;
                 }
 
-                std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for no)" << std::endl;
+                std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no')" << std::endl;
                 std::cin >> confirmUserBorrow;
 
                 if (confirmUserBorrow == 1)
                 {
                     // Create a borrow record session, embedding the individauls name and the ID for the book
                     std::ofstream userBorrowRecord(name + userInput);
-                    // testing
+
+                    // Testing
                     userBorrowRecord << individual.name << "Book Borrowed: " << std::endl;
                     userBorrowRecord << "\nBookID: " << line << std::endl;
                  
