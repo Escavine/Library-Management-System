@@ -38,7 +38,7 @@ void login(int validChances)
     std::cout << "Stepwise University: Identification\n";
     std::cout << "1. Librarian" << std::endl;
     std::cout << "2. Student" << std::endl;
-    std::cout << "\nEnter a corresponding value: " << std::endl;
+    std::cout << "\nEnter a corresponding value: ";
     std::cin >> userInput; // Accept the corresponding value
 
 
