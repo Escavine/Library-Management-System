@@ -83,8 +83,20 @@ class user
                     }
 
 
-                    // Will be used to ensure specific information is appended to the '.txt' file
+                    // Will be used to ensure specific information is appended to the '.txt' file, and will deduct '1' book from the borrowed books
+                    if (fields.size() >= 5)
+                    {
+                        Book book; // Instantiate the object
+                        book.bookID = fields[0];
+                        book.bookTitle = fields[1];
+                        book.yearOfRelease = std::stoi(fields[2]);
+                        book.quantityBorrowed = std::stoi(fields[3]);
+                        book.dateBorrowed = fields[4];
+                        book.remainingBooks = std::stoi(fields[5]);
 
+
+
+                    }
 
 
 
@@ -114,7 +126,7 @@ class user
                     file.seekg(0); // Reset file pointer to the beginnning
 
                     // Create a borrow record session, embedding the individauls name and the ID for the book
-                    std::ofstream outputFile(individual.name + userInput + ".txt"); // Open a text file for writing
+                    std::ofstream outputFile(individual.name + ".txt"); // Open a text file for writing
 
 
                     std::string line;
@@ -404,6 +416,10 @@ class librarian : user // Librarian inherits properties of a user
             {
                 // int remainingChances = 3;
                 // std::cout << "Logging user out of session." << std::endl;
+
+
+                // Future reference: Reference the login function as a header file, that way it can be called whenever without an issue
+
                 // login(remainingChances);  
             }
             else
