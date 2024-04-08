@@ -45,7 +45,7 @@ class user
 
 
 
-            std::cout << "\nEnter the Book ID for the book you'd like to borrow (FORMAT: xxx-xxx-xxx): " << std::endl;
+            std::cout << "\nEnter the Book ID for the book you'd like to borrow (FORMAT: xxx-xxx-xxx): ";
             std::cin >> userInput; // Register user input
 
 
@@ -58,8 +58,11 @@ class user
             if (!file.is_open())
             {
                 std::cerr << "\nCannot find book." << std::endl;
+                clearInputBuffer(); // Clear the buffer
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
+                system("CLS"); // Clear the console
+                borrowBook(individual); 
             }
-            
             else
             {
                 int confirmUserBorrow;
@@ -93,18 +96,15 @@ class user
                         book.quantityBorrowed = std::stoi(fields[3]);
                         book.dateBorrowed = fields[4];
                         book.remainingBooks = std::stoi(fields[5]);
-
-
-
                     }
 
 
 
-                    for (const auto& f : fields)
-                    {
-                        std::cout << f << " ";
-                    }
-                    std::cout << std::endl;
+                    // for (const auto& f : fields)
+                    // {
+                        // std::cout << f << " ";
+                    // }
+                    // std::cout << std::endl;
                 }
 
                 std::cout << "\nWould you like to borrow this book? (1 for 'yes' and any other key for 'no'): ";
@@ -119,14 +119,14 @@ class user
                     char dt[100]; // Store the following information from 'strftime' into 'dt'
                     
                     // Format the date and time into string format using strftime
-                    strftime(dt, sizeof(dt), "%Y-%M-%D %H:%M-%S", localtime(&localTime));
+                    strftime(dt, sizeof(dt), "%D-%M-%Y %H:%M-%S", localtime(&localTime));
 
 
                     file.clear(); // Clear the previous errors with the file
                     file.seekg(0); // Reset file pointer to the beginnning
 
                     // Create a borrow record session, embedding the individauls name and the ID for the book
-                    std::ofstream outputFile(individual.name + ".txt"); // Open a text file for writing
+                    std::ofstream outputFile(name + ".txt"); // Open a text file for writing
 
 
                     std::string line;
@@ -162,8 +162,25 @@ class user
                 }
                 else
                 {
-                    std::cout << "Would you like to perhaps borrow another book, or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard)" << std::endl;
+                    std::string userChoice;
+                    std::cout << "Would you like to borrow another book or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard):";
                     
+                    if (userChoice == "1")
+                    {
+                        std::cout << "Redirecting user to borrow another book..." << std::endl;
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        system("CLS");
+                        clearInputBuffer();
+                        borrowBook(individual);
+                    }
+                    else
+                    {
+                        std::cout << "Redirecting user to the dashboard..." << std::endl;
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        system("CLS");
+                        clearInputBuffer();
+                    }
+
                 }
 
             }
