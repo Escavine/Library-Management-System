@@ -45,7 +45,7 @@ class user
 
 
 
-            std::cout << "\nEnter the Book ID for the book you'd like to borrow: " << std::endl;
+            std::cout << "\nEnter the Book ID for the book you'd like to borrow (FORMAT: xxx-xxx-xxx): " << std::endl;
             std::cin >> userInput; // Register user input
 
 
@@ -81,6 +81,12 @@ class user
                     {
                         fields.push_back(field); // Append per field to the vector
                     }
+
+
+                    // Will be used to ensure specific information is appended to the '.txt' file
+
+
+
 
                     for (const auto& f : fields)
                     {
@@ -482,7 +488,7 @@ class student : user // Student inherits properties of a user
             int numCount = 1;
             std::cout << "Stepwise University: Staff/Librarian Dashboard\n";
             std::cout << "\n"; // Spacing
-            std::cout << "Welcome " << name << std::endl;
+            std::cout << "Welcome " << person.username << std::endl;
             std::cout << "\n"; // Spacing
 
             for (int i = 0; i < dashboardOptions.size(); i++) // Iterate through the vector values, displaying them to the staff member
