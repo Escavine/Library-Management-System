@@ -36,7 +36,7 @@ public:
 
         std::cout << "Stepwise University: Checking for existence of books\n";
 
-        std::ifstream checkExist("RegisteredBooks.csv");
+        std::ifstream checkExist("RegisteredBooks.csv"); // Read from the file
 
         if (!checkExist)
         {
@@ -45,15 +45,44 @@ public:
 
             // Future reference: once overriding has been added, redirect user to the dashboard
         }
-        
+
         system("CLS"); // Clear the console, should there be books present
 
         std::cout << "Stepwise University: Borrowing a Book\n";
 
-        std::cout << "\nCurrent books registered on the system: " << std::endl;
+        std::cout << "\nCurrent books registered on the system: " << "\n" << std::endl;
+
+        std::string line;
+        std::vector<Book> bookRegistering; // Vector for displaying the number of books available
+
+        while (std::getline(checkExist, line))
+        {
+            std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: " }; // Contains all relevant information for the book
+            std::stringstream ss(line);
+            std::string field;
+            std::vector<std::string> fields; // Will contain the appended information for the book
+
+            while (std::getline(ss, field))
+            {
+                fields.push_back(field); // Append the following information to the vector
+
+                for (int i = 0; i < order.size();)
+                {
+                    for (int x = 0; x < fields.size();)
+                    {
+                        std::cout << order[i] << fields[x] << "\n"; // Display the current book/books available on the library system
+                        i += 1;
+                        x += 1;
+                    }
+                    std::cout << std::endl; // Spacing
+                }
+
+            }
 
 
+        }
 
+        
         // Count the number of books the user has borrowed prior
         int borrowedBooksCount = 0;
         for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
@@ -425,16 +454,16 @@ public:
                     // Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
                 }
 
-                
+
 
             }
         }
 
 
 
-            // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
+        // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
 
-        }
+    }
 
     void calculatingFine()
     {
@@ -741,7 +770,7 @@ public:
 
         std::ofstream bookCollection("RegisteredBooks.csv", std::ios::app); // Create a file/write on a file to register the book
 
-        bookCollection << book.bookID << "," << book.bookTitle; // Define a structure for the collected books (the book ID and the book name)
+        bookCollection << book.bookID << " " << book.bookTitle << " " << book.yearOfRelease << " " << book.bookPublisher << " " << book.numberOfReleases << " " << book.remainingBooks << "\n"; // Define a structure for the collected books (the book ID and the book name)
 
 
     }
