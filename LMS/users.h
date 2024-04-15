@@ -32,7 +32,27 @@ public:
     {
         std::string userInput;
 
+        // Check if there's any books registered in the system, should there not be any books, return user to the menu
+
+        std::cout << "Stepwise University: Checking for existence of books\n";
+
+        std::ifstream checkExist("RegisteredBooks.csv");
+
+        if (!checkExist)
+        {
+            std::cout << "\nNo books are currently registered on the system..." << std::endl;
+            exit(1); // Temporary measure to deal with non-existing books
+
+            // Future reference: once overriding has been added, redirect user to the dashboard
+        }
+        
+        system("CLS"); // Clear the console, should there be books present
+
         std::cout << "Stepwise University: Borrowing a Book\n";
+
+        std::cout << "\nCurrent books registered on the system: " << std::endl;
+
+
 
         // Count the number of books the user has borrowed prior
         int borrowedBooksCount = 0;
@@ -721,7 +741,7 @@ public:
 
         std::ofstream bookCollection("RegisteredBooks.csv", std::ios::app); // Create a file/write on a file to register the book
 
-        bookCollection << book.bookID << "," << book.bookTitle << ","; // Define a structure for the collected books
+        bookCollection << book.bookID << "," << book.bookTitle; // Define a structure for the collected books (the book ID and the book name)
 
 
     }
