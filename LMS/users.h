@@ -671,11 +671,9 @@ public:
         std::cout << "\nEnter the book ID (format: xxx-xxx-xxx): ";
         std::cin >> book.bookID; // Add a structure for the book ID's that need to be followed
 
-        bool checkPattern = bookIDPattern(book.bookID);
-
-        if (!checkPattern)
+        if (!bookIDPattern(book.bookID))
         {
-            std::cout << "\nIncorrect book ID structure, please try again." << std::endl;
+            std::cout << "\nInvalid book ID, you'll be sent back to re-input your information." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read
             system("CLS");
             staff.clearInputBuffer();
@@ -695,7 +693,18 @@ public:
 
         std::cout << "\nEnter the year of book published: ";
         std::cin >> book.yearOfRelease;
-        staff.clearInputBuffer();
+
+        if (!yearValidator(book.yearOfRelease)) // Check if the year format is valid
+        {
+            std::cout << "\nInvalid year registered, you'll be sent back to re-input your information." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
+            system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
+            registerBook(staff); // Recurse
+        }
+        else
+        {
+            staff.clearInputBuffer();
+        }
 
         std::cout << "\nEnter the name of the book publisher: ";
         std::getline(std::cin, book.bookPublisher);
@@ -770,7 +779,7 @@ public:
 
         std::ofstream bookCollection("RegisteredBooks.csv", std::ios::app); // Create a file/write on a file to register the book
 
-        bookCollection << book.bookID << " " << book.bookTitle << " " << book.yearOfRelease << " " << book.bookPublisher << " " << book.numberOfReleases << " " << book.remainingBooks << "\n"; // Define a structure for the collected books (the book ID and the book name)
+        bookCollection << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n"; // Define a structure for the collected books (the book ID and the book name)
 
 
     }
@@ -836,6 +845,11 @@ public:
             librarianDashboard(staff); // Recurse 
         }
 
+    }
+
+    bool yearValidator(int y)
+    {
+        return (y <= 2024); // Pre-set limit for the year, in this case 2024
     }
 
     bool bookIDPattern(const std::string& bookID)
