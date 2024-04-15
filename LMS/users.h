@@ -50,7 +50,7 @@ public:
 
         std::cout << "Stepwise University: Borrowing a Book\n";
 
-        std::cout << "\nCurrent books registered on the system: " << "\n" << std::endl;
+        std::cout << "\nCurrent books registered on the system: " << "\n" << std::endl; // Numerous books can be registered on the system
 
         std::string line;
         std::vector<Book> bookRegistering; // Vector for displaying the number of books available
@@ -62,23 +62,28 @@ public:
             std::string field;
             std::vector<std::string> fields; // Will contain the appended information for the book
 
-            while (std::getline(ss, field))
+            while (std::getline(ss, field, ',')) // ',' is the delimiter
             {
                 fields.push_back(field); // Append the following information to the vector
-
-                for (int i = 0; i < order.size();)
-                {
-                    for (int x = 0; x < fields.size();)
-                    {
-                        std::cout << order[i] << fields[x] << "\n"; // Display the current book/books available on the library system
-                        i += 1;
-                        x += 1;
-                    }
-                    std::cout << std::endl; // Spacing
-                }
-
             }
 
+            if (fields.size() == order.size()) // Ensure both vectors have the same size            
+            {
+                Book book;
+                book.bookID = fields[0];
+                book.bookTitle = fields[1];
+                book.yearOfRelease = std::stoi(fields[2]);
+                book.bookPublisher = fields[3];
+                book.numberOfReleases = std::stoi(fields[4]);
+                book.remainingBooks = std::stoi(fields[5]);
+
+                // Print book information
+                for (int i = 0; i < order.size(); ++i)
+                {
+                    std::cout << order[i] << fields[i] << "\n";
+                }
+                std::cout << std::endl;
+            }
 
         }
 
@@ -674,13 +679,23 @@ public:
         if (!bookIDPattern(book.bookID))
         {
             std::cout << "\nInvalid book ID, you'll be sent back to re-input your information." << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read information
             system("CLS");
             staff.clearInputBuffer();
-            registerBook(staff); // Recurse
+            staff.registerBook(staff); // Recurse
         }
         else
         {
+            checkExistingBookID(book.bookID); // Check if there's an already existing book ID for that given ID inputted by the librarian
+
+            if (!checkExistingBookID(book.bookID))
+            {
+                std::cout << "\nBook ID already exists in the library system, you'll be sent back to re-input your information." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read information
+                system("CLS"); // Clear the console
+                staff.clearInputBuffer(); // Clear the input buffer
+                staff.registerBook(staff); // Recurse
+            }
             staff.clearInputBuffer();
         }
 
@@ -858,6 +873,20 @@ public:
         return std::regex_match(bookID, pattern); // Return true, if there's match in design
     }
 
+    bool checkExistingBookID(std::string bookID)
+    {
+        std::ifstream check(bookID + ".csv"); // Will check if the following book exists within the system, if so, error will be outputted
+        
+        if (!check.is_open()) // Should it not open, essentially meaning it doesn't exist, then return 'true'
+        {
+            return true;
+        }
+        else // Otherwise, false
+        {
+            return false;
+        }
+    }
+
     // Will retrieve the individuals role (i.e. a librarian)
     std::string getRole() const
     {
@@ -869,6 +898,5 @@ protected:
     std::string name = "Khalid";
     std::string username = "Eucladian";
     std::string password = "euclade1";
-
 
 };
