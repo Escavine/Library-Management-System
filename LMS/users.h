@@ -552,18 +552,21 @@ public:
 
         }
 
-        std::string usernameInput;
-        std::string passwordInput;
+        std::string name, surname, username, password;
 
         // Request for relevant details of the individual
         std::cout << "Stepwise University: Student Login\n";
-        std::cout << "\nInput your username: ";
-        std::cin >> usernameInput;
 
-        std::cout << "\nInput your password: ";
-        std::cin >> passwordInput;
+        std::cout << "\nInput your name: ";
+        std::getline(std::cin, name);
+
+        std::cout << "\nInput your surname: ";
+        std::getline(std::cin, surname);
 
 
+
+
+        std::ifstream 
 
     }
 
