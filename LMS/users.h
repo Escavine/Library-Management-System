@@ -556,25 +556,15 @@ public:
         std::string passwordInput;
 
         // Request for relevant details of the individual
-        std::cout << "Stepwise University - Student Login\n";
+        std::cout << "Stepwise University: Student Login\n";
         std::cout << "\nInput your username: ";
         std::cin >> usernameInput;
 
         std::cout << "\nInput your password: ";
         std::cin >> passwordInput;
 
-        if (usernameInput == username && passwordInput == password)
-        {
-            std::cout << "\nStudent authenticated." << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
-            system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-            studentDashboard(person); // Lead user to their dashboard
-        }
-        else
-        {
-            std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
-            studentLogin(remainingChances - 1, person); // Reduce number of chances per recursion to avoid brute force
-        }
+
+
     }
 
     void studentDashboard(student person)
@@ -585,9 +575,7 @@ public:
         // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
 
         int numCount = 1;
-        std::cout << "Stepwise University: Staff/Librarian Dashboard\n";
-        std::cout << "\n"; // Spacing
-        std::cout << "Welcome " << person.username << std::endl;
+        std::cout << "Stepwise University: Student Dashboard\n";
         std::cout << "\n"; // Spacing
 
         for (int i = 0; i < dashboardOptions.size(); i++) // Iterate through the vector values, displaying them to the staff member
@@ -618,17 +606,10 @@ public:
             system("CLS"); // Clear console
             person.returnBook(person); // Redirect user
         }
-        else if (userChoice == "3")
+        else if (userChoice == "3") // Allows for the creation of a student account
         {
             std::cout << "\nTerminating user session..." << std::endl;
             exit(1); // Successfully terminate the users session
-
-        }
-        else if (userChoice == "4")
-        {
-            // int remainingChances = 3;
-            // std::cout << "Logging user out of session." << std::endl;
-            // login(remainingChances);  
         }
         else
         {
@@ -639,18 +620,6 @@ public:
         }
 
     }
-
-
-    // Will retrieve the individuals role (i.e. a librarian)
-    std::string getRole() const
-    {
-        return "student";
-    }
-
-private:
-    // Test data for authenticating login
-    std::string username = "Eucladian";
-    std::string password = "euclade1";
 
 };
 
@@ -843,7 +812,7 @@ public:
     {
         std::string userChoice;
 
-        std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Terminate Session" }; // Vector of string options
+        std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Register a student", "Terminate Session" }; // Vector of string options
         // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
 
         int numCount = 1;
@@ -888,6 +857,49 @@ public:
             staff.returnBook(staff); // Direct the individual to the return book function
         }
         else if (userChoice == "4")
+        {
+            std::cout << "\nRegistering a student option has been chosen. Redirecting user..." << std::endl;
+            std::string name, surname, username, password;
+            staff.clearInputBuffer();
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
+            system("CLS");
+
+            std::cout << "Stepwise University: Student Registering" << std::endl;
+
+            std::cout << "\nEnter the student's name: ";
+            std::getline(std::cin, name); // Allowing spaces in name
+
+            std::cout << "\nEnter the student's surname: ";
+            std::getline(std::cin, surname); // Allowing spaces in surname
+
+            std::cout << "\nEnter the student's username: ";
+            std::cin >> username;
+
+            std::cout << "\nEnter the student's password: ";
+            std::cin >> password;
+
+            // Create a '.csv' file for the student
+            std::ofstream file(name + "_" + surname + ".csv");
+
+            if (file.is_open()) {
+                file << name << "," << surname << "," << username << "," << password;
+                file.close();
+                std::cout << "\nStudent successfully registered!" << std::endl;
+            }
+            else {
+                std::cerr << "Unable to open file for writing." << std::endl;
+            }
+
+            std::cout << "\nPress any key to return to the dashboard.\n" << std::endl;
+
+            system("pause"); // Register user input
+
+            std::cout << "\nRedirecting user..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds for transfer
+            system("CLS"); // Clear the console
+            staff.librarianDashboard(staff); // Return to dashboard
+        }
+        else if (userChoice == "5")
         {
             std::cout << "\nTerminating user session...." << std::endl;
             exit(1); // Terminate the console 
