@@ -4,17 +4,15 @@ const int MAX_FILES_TO_CHECK = 100; // Will be used to check for number of books
 
 // Structure for a book
 struct Book {
-    std::string bookID;
-    std::string bookTitle;
-    std::string bookPublisher;
-    std::string dateBorrowed;
+    std::string bookID, bookTitle, bookPublisher, dateBorrowed;
 
     std::vector<std::string> relevantSubjects;
 
-    int numberOfReleases;
-    int yearOfRelease;
-    int remainingBooks;
-    int quantityBorrowed;
+    int numberOfReleases, yearOfRelease, remainingBooks, quantityBorrowed;
+};
+
+struct studentlogin {
+    std::string name, surname, username, password;
 };
 
 
@@ -109,8 +107,8 @@ public:
                     std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: " };
                     // Create stringstream from line
                     std::stringstream ss(line);
-                    std::string field; // Defining a single field for the CSV
-                    std::vector<std::string> fields; // Defining fields for the CSV 
+                    std::string field; // Defining a single field for the '.csv'
+                    std::vector<std::string> fields; // Defining fields for the '.csv' 
 
                     while (std::getline(ss, field, ',')) // Parse each field of the line
                     {
@@ -536,6 +534,8 @@ public:
 
     void studentLogin(int remainingChances, student person)
     {
+        std::string name, surname, username, password;
+
         if (remainingChances < 3) // Check if user has less than 3 chances
         {
             if (remainingChances == 0) // Nested selection statement to check if the chances has reached zero.
@@ -552,10 +552,8 @@ public:
 
         }
 
-        std::string name, surname, username, password;
-
         // Request for relevant details of the individual
-        std::cout << "Stepwise University: Student Login\n";
+        std::cout << "Stepwise University: Student Identification\n";
 
         std::cout << "\nInput your name: ";
         std::getline(std::cin, name);
@@ -563,11 +561,42 @@ public:
         std::cout << "\nInput your surname: ";
         std::getline(std::cin, surname);
 
+        std::ifstream findingUserOnSystem(name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
+
+        if (findingUserOnSystem.is_open())
+        {
+            std::string line;
+            std::vector<std::string> lines; // Vector that will append the given values
+            std::vector<studentlogin> student; // Will retain the following fields for the user (i.e. name, surname, username and password) via a vector
+
+            std::cout << "\nStudent identified." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            system("CLS"); // Clear the console
+
+            // Proceed with logging in the user
+            std::cout << "Stepwise University: Student Login\n";
+
+            std::cout << "\nEnter your username: ";
+            std::getline(std::cin, username);
+
+            std::cout << "\nEnter your password: ";
+            std::getline(std::cin, password);
 
 
 
-        std::ifstream 
 
+        }
+        else
+        {
+            std::cout << "\nUnidentified individual, please try again." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            system("CLS"); // Clear the console
+
+            studentLogin(remainingChances - 1, person);
+
+        }
     }
 
     void studentDashboard(student person)
@@ -882,7 +911,7 @@ public:
             std::cin >> password;
 
             // Create a '.csv' file for the student
-            std::ofstream file(name + "_" + surname + ".csv");
+            std::ofstream file("student_" + name + "_" + surname + ".csv");
 
             if (file.is_open()) {
                 file << name << "," << surname << "," << username << "," << password;
