@@ -535,6 +535,7 @@ public:
     void studentLogin(int remainingChances, student person)
     {
         std::string name, surname, username, password;
+        person.clearInputBuffer(); // Clear buffer prior to information collection
 
         if (remainingChances < 3) // Check if user has less than 3 chances
         {
@@ -561,12 +562,13 @@ public:
         std::cout << "\nInput your surname: ";
         std::getline(std::cin, surname);
 
-        std::ifstream findingUserOnSystem(name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
+        std::ifstream findingUserOnSystem("student_" + name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
 
         if (findingUserOnSystem.is_open())
         {
-            std::string line;
-            std::vector<std::string> lines; // Vector that will append the given values
+            std::string field;
+            std::vector<std::string> fields; // Vector that will append the given values
+            std::stringstream ss(field);
             std::vector<studentlogin> student; // Will retain the following fields for the user (i.e. name, surname, username and password) via a vector
 
             std::cout << "\nStudent identified." << std::endl;
@@ -583,7 +585,30 @@ public:
             std::cout << "\nEnter your password: ";
             std::getline(std::cin, password);
 
+            while (std::getline(findingUserOnSystem, field)) 
+            {
+                while (std::getline(ss, field, ','))
+                {
+                    fields.push_back(field); // Append the following information to the 'lines' variable
+                }
 
+                if (fields.size() >= 4)
+                {
+                    studentlogin login; // Create a new session of the student login structure
+
+                    // Register each given field to the struct
+                    login.name = fields[0];
+                    login.surname = fields[1];
+                    login.username = fields[3];
+                    login.password = fields[4];
+
+                }
+
+                std::cout << "\nAuthenticating user...";
+
+                // Add logic to authenticate the user
+                                        
+            }
 
 
         }
