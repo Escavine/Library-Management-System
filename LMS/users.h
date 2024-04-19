@@ -239,8 +239,6 @@ public:
 
                             outputFile << "Date Borrowed: " << dt << std::endl;
 
-                            std::cout << "\nBook borrowed successfully!\n" << std::endl;
-
                             file.clear(); // Clear the previous errors with the file
                             file.seekg(0); // Reset file pointer
 
@@ -283,6 +281,21 @@ public:
                                 }
                             }
 
+
+                            // Find the given book in the '.csv' file that stores all the current books on the system, and deduct the amount based on the book ID
+                            for (auto& book : books)
+                            {
+                                if (book.bookID == inputBookID)
+                                {
+                                    book.remainingBooks--; // Reduce book quantity by 1
+                                    std::cout << "\nBook borrowed successfully!" << std::endl;
+                                }
+                                else
+                                {
+                                    std::cout << "\nIssue borrowing book, check code for any issues." << std::endl;
+                                }
+                            }
+
                             // Open the .CSV file again for writing
                             std::ofstream fileUpdateWrite(inputBookID + ".csv");
 
@@ -293,8 +306,7 @@ public:
                                     << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n";
                             }
 
-                            break; // Remove this section of code and replace it with the code below...
-
+                            exit(1); // Terminate to mitigate future issues (temp solution)
 
                         }
                     }
