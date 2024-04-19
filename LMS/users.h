@@ -506,7 +506,7 @@ public:
                 {
                     std::cout << "Returning user to menu..." << std::endl;
 
-                    // Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
+// Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
                 }
 
 
@@ -597,32 +597,44 @@ public:
             std::cout << "\nEnter your password: ";
             std::getline(std::cin, password);
 
-            while (std::getline(findingUserOnSystem, field)) 
+            std::string line;
+
+            while (std::getline(findingUserOnSystem, line))
             {
-                while (std::getline(ss, field, ','))
+                std::istringstream iss(line);
+
+                // Conditions to authenticate the user, by retrieving the stored username and password from the file and comparing it to the users input
+                std::string storedFirstName, storedLastName, storedUsername, storedPassword;
+
+                if (std::getline(iss, storedFirstName, ',') &&
+                    std::getline(iss, storedLastName, ',') &&
+                    std::getline(iss, storedUsername, ',') &&
+                    std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
                 {
-                    fields.push_back(field); // Append the following information to the 'lines' variable
+                    if (username == storedUsername && password == storedPassword)
+                    {
+                        std::cout << "\nStudent authenticated." << std::endl;
+
+                        std::cout << "\nClick any key to go to the student dashboard.\n" << std::endl;
+
+                        system("pause");
+
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+                        person.studentDashboard(person); // Redirect user to the student dashboard
+
+                    }
+                    else
+                    {
+                        std::cout << "\nUsername or password not recognized, please try again." << std::endl;
+
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+
+                        person.studentLogin(remainingChances - 1, person); // Reduce chances, and recurse
+                    }
                 }
-
-                if (fields.size() >= 4)
-                {
-                    studentlogin login; // Create a new session of the student login structure
-
-                    // Register each given field to the struct
-                    login.name = fields[0];
-                    login.surname = fields[1];
-                    login.username = fields[3];
-                    login.password = fields[4];
-
-                }
-
-                std::cout << "\nAuthenticating user...";
-
-                // Add logic to authenticate the user
-                                        
             }
-
-
         }
         else
         {
