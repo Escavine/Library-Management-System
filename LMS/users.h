@@ -9,10 +9,12 @@ struct Book {
     std::vector<std::string> relevantSubjects;
 
     int numberOfReleases, yearOfRelease, remainingBooks, quantityBorrowed;
+
 };
 
 struct studentlogin {
     std::string name, surname, username, password;
+
 };
 
 
@@ -26,7 +28,7 @@ public:
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
     }
 
-    void borrowBook(user individual) // This is dynamic and can be a teacher/student
+    void borrowBook(user individual, std::string name, std::string surname) // This is dynamic and can be a teacher/student
     {
         std::string userInput;
         std::string inputBookID;
@@ -90,7 +92,7 @@ public:
                 clearInputBuffer(); // Clear the buffer
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
                 system("CLS"); // Clear the console
-                borrowBook(individual);
+                borrowBook(individual, name, surname);
             }
             else
             {
@@ -133,7 +135,7 @@ public:
                             individual.clearInputBuffer(); // Clean the input buffer to prevent issues
 
                             system("CLS"); // Clear console
-                            individual.borrowBook(individual); // Recurse, allowing for the user to pick a different book
+                            individual.borrowBook(individual, name, surname); // Recurse, allowing for the user to pick a different book
 
                         }
                         else
@@ -324,7 +326,7 @@ public:
                         std::this_thread::sleep_for(std::chrono::seconds(3));
                         system("CLS");
                         clearInputBuffer();
-                        borrowBook(individual);
+                        borrowBook(individual, name, surname);
                     }
                     else
                     {
@@ -392,14 +394,14 @@ public:
 
             std::cout << "\nRedirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
-            borrowBook(individual); // Recurse
+            borrowBook(individual, name, surname); // Recurse
         }
         else
         {
             std::cout << "\nInvalid input, please try again." << std::endl;
             clearInputBuffer(); // Clear the buffer
             system("CLS"); // Clear the console
-            borrowBook(individual); // Recurse
+            borrowBook(individual, name, surname); // Recurse
         }
 
          
@@ -448,7 +450,7 @@ public:
             clearInputBuffer(); // Clear the buffer
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
             system("CLS"); // Clear the console
-            borrowBook(individual);
+            borrowBook(individual, name, surname);
         }
         else
         {
@@ -621,7 +623,7 @@ public:
 
                         std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
                         system("CLS"); // Clear the console
-                        person.studentDashboard(person); // Redirect user to the student dashboard
+                        person.studentDashboard(person, name, surname); // Recurse 
 
                     }
                     else
@@ -648,7 +650,7 @@ public:
         }
     }
 
-    void studentDashboard(student person)
+    void studentDashboard(student person, std::string name, std::string surname)
     {
         std::string userChoice;
 
@@ -677,7 +679,7 @@ public:
             std::cout << "\nBorrowing a book option has been selected. Redirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
             system("CLS"); // Clear console
-            person.borrowBook(person); // Redirect user
+            person.borrowBook(person, name, surname); // Redirect user
 
         }
         else if (userChoice == "2")
@@ -697,7 +699,7 @@ public:
             std::cout << "\nInvalid input, please try again." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
             system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-            studentDashboard(person); // Recurse 
+            studentDashboard(person, name, surname); // Recurse 
         }
 
     }
@@ -927,7 +929,7 @@ public:
             std::cout << "\nBorrowing a book option has been selected. Redirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
             system("CLS"); // Clear console
-            staff.borrowBook(staff);
+            staff.borrowBook(staff, name, surname);
 
         }
         else if (userChoice == "3")
