@@ -9,12 +9,14 @@ struct Book {
     std::vector<std::string> relevantSubjects;
 
     int numberOfReleases, yearOfRelease, remainingBooks, quantityBorrowed;
-
 };
 
 struct studentlogin {
     std::string name, surname, username, password;
+};
 
+struct stafflogin {
+    std::string name, surname, username, password;
 };
 
 
@@ -729,29 +731,88 @@ public:
 
         }
 
-        std::string usernameInput;
-        std::string passwordInput;
+        std::string staffName, staffSurname, staffUsername, staffPassword;
 
         // Request for relevant details of the individual
-        std::cout << "Stepwise University: Staff Login\n";
-        std::cout << "\nInput your username: ";
-        std::cin >> usernameInput;
+        std::cout << "Stepwise University: Student Identification\n";
 
-        std::cout << "\nInput your password: ";
-        std::cin >> passwordInput;
+        std::cout << "\nInput your name: ";
+        std::getline(std::cin, name);
 
-        if (usernameInput == username && passwordInput == password)
+        std::cout << "\nInput your surname: ";
+        std::getline(std::cin, surname);
+
+        std::ifstream findingUserOnSystem("student_" + name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
+
+        if (findingUserOnSystem.is_open())
         {
-            std::cout << "\nIndividual authenticated." << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
-            system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-            librarianDashboard(staff);
+            std::string field;
+            std::vector<std::string> fields; // Vector that will append the given values
+            std::stringstream ss(field);
+            std::vector<studentlogin> staff; // Will retain the following fields for the user (i.e. name, surname, username and password) via a vector
 
+            std::cout << "\nStudent identified." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            system("CLS"); // Clear the console
+
+            // Proceed with logging in the user
+            std::cout << "Stepwise University: Student Login\n";
+
+            std::cout << "\nEnter your username: ";
+
+
+            std::cout << "\nEnter your password: ";
+
+
+            std::string line;
+
+            while (std::getline(findingUserOnSystem, line))
+            {
+                std::istringstream iss(line);
+
+                // Conditions to authenticate the user, by retrieving the stored username and password from the file and comparing it to the users input
+                std::string storedFirstName, storedLastName, storedUsername, storedPassword;
+
+                if (std::getline(iss, storedFirstName, ',') &&
+                    std::getline(iss, storedLastName, ',') &&
+                    std::getline(iss, storedUsername, ',') &&
+                    std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
+                {
+                    if (username == storedUsername && password == storedPassword)
+                    {
+                        std::cout << "\nStudent authenticated." << std::endl;
+
+                        std::cout << "\nClick any key to go to the student dashboard.\n" << std::endl;
+
+                        system("pause");
+
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+                        person.studentDashboard(person, name, surname); // Recurse 
+
+                    }
+                    else
+                    {
+                        std::cout << "\nUsername or password not recognized, please try again." << std::endl;
+
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+
+                        person.studentLogin(remainingChances - 1, person); // Reduce chances, and recurse
+                    }
+                }
+            }
         }
         else
         {
-            std::cout << "\nIncorrect login details, please try again.\n" << std::endl;
-            librarianLogin(remainingChances - 1, staff); // Reduce number of chances per recursion to avoid brute force
+            std::cout << "\nUnidentified individual, please try again." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            system("CLS"); // Clear the console
+
+            studentLogin(remainingChances - 1, person);
+
         }
     }
 
@@ -1030,8 +1091,8 @@ public:
 
 protected:
     // Test data for authenticating login
-    std::string name = "Khalid";
-    std::string username = "Eucladian";
-    std::string password = "euclade1";
+    // std::string name = "Khalid";
+    // std::string username = "Eucladian";
+    // std::string password = "euclade1";
 
 };
