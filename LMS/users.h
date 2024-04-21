@@ -176,7 +176,7 @@ public:
                     char dt[100]; // Store the following information from 'strftime' into 'dt'
 
                     // Format the date and time into string format using strftime
-                    strftime(dt, sizeof(dt), "%D-%M-%Y", localtime(&localTime));
+                    strftime(dt, sizeof(dt), "%d/%m/%Y", localtime(&localTime));
 
                     // Files are created linearly, check if previous linear files exist and create a new borrowing session based on that (i.e. file structure: name + surname + number starting from 1,2,3,4....)
 
@@ -235,11 +235,9 @@ public:
                                         << book.quantityBorrowed << "\nRemaining Books: " << book.remainingBooks << "\n";
                                 }
 
-                                outputFile << "\n";
-
                             }
 
-                            outputFile << "Date Borrowed: " << dt << std::endl;
+                            outputFile << dt << std::endl;
 
                             file.clear(); // Clear the previous errors with the file
                             file.seekg(0); // Reset file pointer
@@ -446,7 +444,7 @@ public:
 
                 // Check if the date borrowed has passed two weeks compared to current time
                 
-                calculatingFine(); // Execute the given function
+                calculatingFine(name, surname); // Execute the given function
 
                 // Additional logic for processing book information goes here
                 std::cout << "Would you like to return the following book? (1 for 'yes' and any other key for 'no'): ";
@@ -472,9 +470,21 @@ public:
         }
     }
 
-    void calculatingFine()
+    void calculatingFine(std::string name, std::string surname)
     {
         // Insert logic for calculating a fine based on how long the book as taken for it to be returned
+        
+        time_t localTime; // Retrieve local time
+        time(&localTime);
+
+        char dt[100]; // Store the date
+
+        // Format the date and time into string format using strftime, will be used for comparison
+        strftime(dt, sizeof(dt), "%d/%m/%Y", localtime(&localTime));
+
+        // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
+
+
 
 
     }
