@@ -404,106 +404,32 @@ public:
 
 
 
-    void returnBook(user individual) // Should a user want to return a book, then this function will be executed
+    void returnBook(user individual, std::string name, std::string surname) // Should a user want to return a book, then this function will be executed
     {
         std::string userChoice, userChoice2;
 
-        // std::cout << "Stepwise University: Returning Book" << std::endl;
+        std::cout << "Stepwise University: Returning Book" << std::endl;
 
         // Count the number of books the user has borrowed 
-        // int borrowedBooksCount = 0;
-        // for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
-        // {
-            // std::ifstream checkExistingFile( + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt");
-            // if (checkExistingFile.is_open()) {
-                // borrowedBooksCount++;
-                // checkExistingFile.close(); // Close the file
-            // }
-        // }
-
-        // std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
-
-        std::cout << "\nEnter the book ID of the book you'd like to return: ";
-        std::cin >> userChoice;
-
-        // Open CSV file to load the books that are available in the library
-        std::ifstream file(userChoice + ".txt"); // Open the '.txt' file
-
-        std::string line;
-
-        if (!file.is_open()) // Check if the following file exists
+        int borrowedBooksCount = 0;
+        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
         {
-            std::cerr << "\nCannot find book." << std::endl;
-            clearInputBuffer(); // Clear the buffer
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
-            system("CLS"); // Clear the console
-            // borrowBook(individual, name, surname);
-        }
-        else
-        {
-            while (std::getline(file, line))
-            {
-                std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: ", "Date Borrowed: " };
-                // Create stringstream from line
-                std::stringstream ss(line);
-                std::string field; // Defining a single field for the CSV
-                std::vector<std::string> fields; // Defining fields for the CSV 
-
-                while (std::getline(ss, field, ',')) // Parse each field of the line
-                {
-                    fields.push_back(field); // Append per field to the vector
-                }
-
-                if (fields.size() >= 6)
-                {
-                    Book book;
-                    book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
-                    book.bookID = fields[0];
-                    book.bookTitle = fields[1];
-                    book.yearOfRelease = std::stoi(fields[2]);
-                    book.bookPublisher = fields[3];
-                    book.remainingBooks = std::stoi(fields[5]);
-                    book.dateBorrowed = std::stoi(fields[6]); // Additional item appended to the vector as this is to return a book
-
-
-                    std::cout << "\nFound book!\n" << std::endl;
-
-                    for (int i = 0; i < order.size();)
-                    {
-                        for (int f = 0; f < fields.size();)
-                        {
-                            std::cout << order[i] << fields[f] << " ";
-                            i += 1;
-                            f += 1;
-                            std::cout << "\n";
-                        }
-                    }
-
-                    std::cout << std::endl; // Spacing
-                }
-
-
-                std::cout << "Would you like to return the following book? (Enter the value '1' for yes and any other key for no: ";
-                std::cin >> userChoice2;
-
-                if (userChoice2 == "1")
-                {
-                    // Add the logic for figuring out the fine, by reading the date borrowed, and then figuring out whether 2 weeks has passed, should this be the case, following the coursework instruction and handle as usual
-
-                }
-                else
-                {
-                    std::cout << "Returning user to menu..." << std::endl;
-
-                    // Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
-                }
-
-
-
+            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt"); // Fixed format for each one of the files (name_surname.txt)
+            if (checkExistingFile.is_open()) {
+                borrowedBooksCount++;
+                checkExistingFile.close(); // Close the file
             }
         }
 
+        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl; // Display the number of currently borrowed books by the user
 
+        std::cout << "\nEnter the number of the book you'd like to return (i.e. the first book, then 1, the second book 2 etc...): ";
+        std::cin >> userChoice;
+
+        // Open CSV file to load the books that are available in the library
+        std::ifstream file(name + "_" + surname + "_" + userChoice + ".txt"); // Open the '.txt' file
+
+        std::string line;
 
         // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
 
@@ -643,6 +569,8 @@ public:
         std::cout << "Stepwise University: Student Dashboard\n";
         std::cout << "\n"; // Spacing
 
+        std::cout << "Welcome " + name << "\n" << std::endl;
+
         for (int i = 0; i < dashboardOptions.size(); i++) // Iterate through the vector values, displaying them to the staff member
         {
             std::cout << numCount << ". " << dashboardOptions[i] << std::endl;
@@ -669,7 +597,7 @@ public:
             std::cout << "\nReturning a book has been selected. Redirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
             system("CLS"); // Clear console
-            person.returnBook(person); // Redirect user
+            person.returnBook(person, name, surname); // Redirect user
         }
         else if (userChoice == "3") // Allows for the creation of a student account
         {
@@ -965,7 +893,7 @@ public:
             std::cout << "\nReturning a book option has been selected. Redirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
             system("CLS"); // Clear console
-            staff.returnBook(staff); // Direct the individual to the return book function
+            staff.returnBook(staff, name, surname); // Direct the individual to the return book function
         }
         else if (userChoice == "4")
         {
