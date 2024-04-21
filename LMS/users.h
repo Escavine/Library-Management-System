@@ -404,58 +404,72 @@ public:
 
 
 
-    void returnBook(user individual, std::string name, std::string surname) // Should a user want to return a book, then this function will be executed
-    {
+    void returnBook(user individual, std::string name, std::string surname) {
         std::string userChoice, userChoice2;
 
         std::cout << "Stepwise University: Returning Book" << std::endl;
 
         // Count the number of books the user has borrowed 
         int borrowedBooksCount = 0;
-        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
-        {
-            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt"); // Fixed format for each one of the files (name_surname.txt)
+        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x) {
+            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt");
             if (checkExistingFile.is_open()) {
                 borrowedBooksCount++;
-                checkExistingFile.close(); // Close the file
+                checkExistingFile.close();
             }
         }
 
-        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl; // Display the number of currently borrowed books by the user
+        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
 
         std::cout << "\nEnter the number of the book you'd like to return (i.e. the first book, then 1, the second book 2 etc...): ";
         std::cin >> userChoice;
 
-        // Open CSV file to load the books that are available in the library
-        std::ifstream file(name + "_" + surname + "_" + userChoice + ".txt"); // Open the '.txt' file
+        std::ifstream file(name + "_" + surname + "_" + userChoice + ".txt");
+        if (file.is_open()) {
+            std::string line;
 
-        std::string line;
+            std::cout << "\nBorrowing session has been found, now displaying information...\n" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3));
 
-        while (std::getline(file, line))
-        {
-            std::vector<Book> books;
-            std::istringstream(line);
+            while (std::getline(file, line)) {
+                std::vector<std::string> fields;
+                std::stringstream ss(line);
 
-            if (file.is_open())
-            {
-                std::cout << "\nBorrowing session has been found, now displaying information..." << std::endl;
+                std::string field;
+                while (std::getline(ss, field, ',')) {
+                    fields.push_back(field);
+                }
 
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                for (int i = 0; i < fields.size(); ++i) {
+                    std::cout << fields[i] << "\n";
+                }
 
-                file.close(); // Temporary measure
+                // Check if the date borrowed has passed two weeks compared to current time
+                
+                calculatingFine(); // Execute the given function
 
-            }
-            else
-            {
-                std::cout << "\nBorrowing session has not been found, recursing..." << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                system("CLS"); // Clear the console
-                borrowBook(individual, name, surname); // Recurse
+                // Additional logic for processing book information goes here
+                std::cout << "Would you like to return the following book? (1 for 'yes' and any other key for 'no'): ";
+                std::cin >> userChoice2; // Register user input
+                
+                if (userChoice2 == "1")
+                {
+                    std::cout << "\nReturning book..." << std::endl;
+
+
+                    // Delete the file that keeps the record of the book borrowing session
+
+                }
+                else
+                {
+
+                }
             }
         }
-
-        // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
-
+        else {
+            std::cout << "\nBorrowing session has not been found." << std::endl;
+            // You might want to handle this case differently, such as displaying a message and returning to the main menu
+        }
     }
 
     void calculatingFine()
