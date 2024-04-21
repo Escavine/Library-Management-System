@@ -244,7 +244,7 @@ public:
                             file.clear(); // Clear the previous errors with the file
                             file.seekg(0); // Reset file pointer
 
-                            std::ifstream fileUpdate(inputBookID + ".csv"); // Open the .CSV file for reading
+                            std::ifstream fileUpdate(inputBookID + ".csv"); // Open the .CSV file for writing
                             std::vector<Book> booksUpdate; // Vector for updating book information
 
                             std::string lineUpdate;
@@ -280,6 +280,23 @@ public:
                                     }
 
                                     booksUpdate.push_back(book);
+                                }
+                                
+                                fileUpdate.close(); // Close the instance 
+
+                                std::ofstream updatedFile(inputBookID + ".csv"); // For writing
+
+                                if (!updatedFile)
+                                {
+                                    std::cout << "\nUnable to open file for writing..." << std::endl;
+                                    exit(1);
+                                }
+
+                                // Write the updated book information back to the file
+                                for (const auto& book : booksUpdate)
+                                {
+                                    updatedFile << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
+                                        << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n";
                                 }
                             }
 
