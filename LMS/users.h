@@ -409,7 +409,9 @@ public:
 
         // Count the number of books the user has borrowed 
         int borrowedBooksCount = 0;
-        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x) {
+        int x = 1; // This has intentionally designed to be placed out of the loop, that way it can be used to find the given file and determine if the user has borrowed a book for over 2 weeks
+
+        for (x; x <= MAX_FILES_TO_CHECK; ++x) {
             std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt");
             if (checkExistingFile.is_open()) {
                 borrowedBooksCount++;
@@ -444,7 +446,7 @@ public:
 
                 // Check if the date borrowed has passed two weeks compared to current time
                 
-                calculatingFine(name, surname); // Execute the given function
+                calculatingFine(name, surname, x); // Execute the given function
 
                 // Additional logic for processing book information goes here
                 std::cout << "Would you like to return the following book? (1 for 'yes' and any other key for 'no'): ";
@@ -470,7 +472,7 @@ public:
         }
     }
 
-    void calculatingFine(std::string name, std::string surname)
+    void calculatingFine(std::string name, std::string surname, int x)
     {
         // Insert logic for calculating a fine based on how long the book as taken for it to be returned
         
@@ -484,8 +486,9 @@ public:
 
         // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
 
+        std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".txt"); // Open the following file
 
-
+        std::string field;
 
     }
 
