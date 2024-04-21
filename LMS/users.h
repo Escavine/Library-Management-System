@@ -45,8 +45,6 @@ public:
         {
             std::cout << "\nNo books are currently registered on the system..." << std::endl;
             exit(1); // Temporary measure to deal with non-existing books
-
-            // Future reference: once overriding has been added, redirect user to the dashboard
         }
 
         system("CLS"); // Clear the console, should there be books present
@@ -285,31 +283,6 @@ public:
                                 }
                             }
 
-
-                            // Find the given book in the '.csv' file that stores all the current books on the system, and deduct the amount based on the book ID
-                            for (auto& book : books)
-                            {
-                                if (book.bookID == inputBookID)
-                                {
-                                    book.remainingBooks--; // Reduce book quantity by 1
-                                    std::cout << "\nBook borrowed successfully!" << std::endl;
-                                }
-                                else
-                                {
-                                    std::cout << "\nIssue borrowing book, check code for any issues." << std::endl;
-                                }
-                            }
-
-                            // Open the .CSV file again for writing
-                            std::ofstream fileUpdateWrite(inputBookID + ".csv");
-
-                            // Write the updated book information to the CSV file
-                            for (const auto& book : booksUpdate)
-                            {
-                                fileUpdateWrite << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
-                                    << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n";
-                            }
-
                             exit(1); // Terminate to mitigate future issues (temp solution)
 
                         }
@@ -361,7 +334,7 @@ public:
 
             while (std::getline(checkExist, line))
             {
-                std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: " }; // Contains all relevant information for the book
+                std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: " }; // Contains all relevant information for the book
                 std::stringstream ss(line);
                 std::string field;
                 std::vector<std::string> fields; // Will contain the appended information for the book
@@ -379,7 +352,6 @@ public:
                     book.yearOfRelease = std::stoi(fields[2]);
                     book.bookPublisher = fields[3];
                     book.numberOfReleases = std::stoi(fields[4]);
-                    book.remainingBooks = std::stoi(fields[5]);
 
                     // Print book information
                     for (int i = 0; i < order.size(); ++i)
@@ -390,6 +362,8 @@ public:
                 }
 
             }
+
+            std::cout << "\nFor any information regarding the quantity of remaining books in the library, kindly return to the borrowing menu, click the option to find the book ID and input the given book." << std::endl;
 
             std::cout << "\nPlease enter any key to return to borrowing a book: ";
             system("\npause"); // Register user input
@@ -504,7 +478,7 @@ public:
                 {
                     std::cout << "Returning user to menu..." << std::endl;
 
-// Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
+                    // Overriding user dashboard will be done to allow the indivudal to be redirected correctly...
                 }
 
 
@@ -703,9 +677,11 @@ class librarian : user // Librarian inherits properties of a user
 public:
     void librarianLogin(int remainingChances, librarian staff)
     {
+        std::string staffName, staffSurname, staffUsername, staffPassword; // Will store vital details for the staff member
+
         if (remainingChances < 3) // Check if user has less than 3 chances
         {
-            if (remainingChances == 0) // Nested selection statement to check if the chances has reached zero.
+            if (remainingChances == 0) // Nested selection statement to check if the chances have reached zero.
             {
                 std::cout << "Too many incorrect attempts, console will now terminate." << std::endl;
                 exit(0); // Terminate the console
@@ -715,9 +691,6 @@ public:
                 std::cout << "Remaining chances: " << remainingChances << std::endl;
             }
         }
-
-
-        std::string staffName, staffSurname, staffUsername, staffPassword;
 
         // Request for relevant details of the individual
         std::cout << "Stepwise University: Staff/Librarian Identification\n";
@@ -729,7 +702,10 @@ public:
         std::cout << "\nInput your surname: ";
         std::cin >> staffSurname;
 
-        std::ifstream findingUserOnSystem("staff_" + staffUsername + "_" + staffPassword + ".csv"); // Concatenate the following information to locate the given '.csv' file
+        // Construct the filename using the provided name and surname
+        std::string fileName = "staff_" + staffName + "_" + staffSurname + ".csv";
+
+        std::ifstream findingUserOnSystem(fileName); // Open the file using the constructed filename
 
         if (findingUserOnSystem.is_open())
         {
@@ -738,69 +714,59 @@ public:
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
             system("CLS"); // Clear the console
 
-            // Request for relevant details of the individual
-            std::cout << "Stepwise University: Staff/Librarian Identification\n";
+            // Proceed with logging in the user
+            std::cout << "Stepwise University: Staff/Librarian Login\n";
 
-            std::cout << "\nInput your username: ";
+            std::cout << "\nEnter your username: ";
             std::cin >> staffUsername;
 
-            std::cout << "\nInput your password: ";
+            std::cout << "\nEnter your password: ";
             std::cin >> staffPassword;
 
-            std::ifstream findingUserOnSystem("staff_" + staffUsername + ".csv");
+            std::string line;
 
-            if (findingUserOnSystem.is_open())
+            while (std::getline(findingUserOnSystem, line))
             {
-                std::string line;
+                std::istringstream iss(line);
 
-                while (std::getline(findingUserOnSystem, line))
+                std::string storedName, storedSurname, storedUsername, storedPassword;
+
+                if (std::getline(iss, storedName, ',') &&
+                    std::getline(iss, storedSurname, ',') &&
+                    std::getline(iss, storedUsername, ',') &&
+                    std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
                 {
-                    std::istringstream iss(line);
-
-                    std::string storedUsername, storedPassword;
-
-                    if (std::getline(iss, storedUsername, ',') &&
-                        std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
+                    if (staffUsername == storedUsername && staffPassword == storedPassword)
                     {
-                        if (staffUsername == storedUsername && staffPassword == storedPassword)
-                        {
-                            std::cout << "\nStaff member authenticated." << std::endl;
-                            std::cout << "\nClick any key to go to the staff dashboard.\n" << std::endl;
+                        std::cout << "\nStaff member authenticated." << std::endl;
+                        std::cout << "\nClick any key to go to the staff dashboard.\n" << std::endl;
 
-                            system("pause");
-                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                            system("CLS"); // Clear the console
-                            staff.librarianDashboard(staff, name, surname); // Redirect to the dashboard
-                        }
-                        else
-                        {
-                            std::cout << "\nUsername or password not recognized, please try again." << std::endl;
-                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                            system("CLS"); // Clear the console
-                            librarianLogin(remainingChances - 1, staff); // Reduce chances and recurse
-                        }
+                        system("pause");
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+                        staff.librarianDashboard(staff, staffName, staffSurname); // Redirect to the dashboard
+                    }
+                    else
+                    {
+                        std::cout << "\nUsername or password not recognized, please try again." << std::endl;
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                        system("CLS"); // Clear the console
+                        librarianLogin(remainingChances - 1, staff); // Reduce chances and recurse
                     }
                 }
-            }
-            else
-            {
-                std::cout << "\nUnidentified individual, please try again." << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                system("CLS"); // Clear the console
-                librarianLogin(remainingChances - 1, staff);
             }
         }
         else
         {
             std::cout << "\nStaff member not recognized, please try again..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            clearInputBuffer();
             system("CLS"); // Clear the console
             librarianLogin(remainingChances - 1, staff); // Recurse
         }
-
     }
 
-    void registerBook(librarian staff)
+    void registerBook(librarian staff, std::string name, std::string surname)
     {
         Book book; // Create an instance of a book
         int numCount = 1; // Will keep track of the loop
@@ -819,7 +785,7 @@ public:
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read information
             system("CLS");
             staff.clearInputBuffer();
-            staff.registerBook(staff); // Recurse
+            staff.registerBook(staff, name, surname); // Recurse
         }
         else
         {
@@ -831,7 +797,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds to allow user to read information
                 system("CLS"); // Clear the console
                 staff.clearInputBuffer(); // Clear the input buffer
-                staff.registerBook(staff); // Recurse
+                staff.registerBook(staff, name, surname); // Recurse
             }
             staff.clearInputBuffer();
         }
@@ -851,7 +817,7 @@ public:
             std::cout << "\nInvalid year registered, you'll be sent back to re-input your information." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
             system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-            registerBook(staff); // Recurse
+            registerBook(staff, name, surname); // Recurse
         }
         else
         {
@@ -931,7 +897,7 @@ public:
 
         std::ofstream bookCollection("RegisteredBooks.csv", std::ios::app); // Create a file/write on a file to register the book
 
-        bookCollection << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n"; // Define a structure for the collected books (the book ID and the book name)
+        bookCollection << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << "," << "\n"; // Define a structure for the collected books (the book ID and the book name)
 
 
     }
@@ -940,7 +906,7 @@ public:
     {
         std::string userChoice;
 
-        std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Register a student", "Terminate Session" }; // Vector of string options
+        std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Student registering", "Terminate Session" }; // Vector of string options
         // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
 
         int numCount = 1;
@@ -967,7 +933,7 @@ public:
             std::cout << "\nYou will now be lead to register a book on the system" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before registering a book
             system("CLS"); // Clear the console for cleanliness
-            registerBook(staff); // Lead user to the function
+            registerBook(staff, name, surname); // Lead user to the function
         }
         else if (userChoice == "2")
         {
