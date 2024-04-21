@@ -470,7 +470,17 @@ class user
                         // Delete the file that keeps the record of the book borrowing session
                         // Create a book return record and update the quantity of the following book by '+1'
 
+                        std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
+                        // Delete the file
+                        if (remove(filename.c_str()) != 0)
+                        {
+                            std::perror("Error deleting file");
+                        }
+                        else
+                        {
+                            std::cout << "File successfully deleted" << std::endl;
+                        }
                     }
                     else
                     {
