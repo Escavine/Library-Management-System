@@ -431,6 +431,29 @@ public:
 
         std::string line;
 
+        while (std::getline(file, line))
+        {
+            std::vector<Book> books;
+            std::istringstream(line);
+
+            if (file.is_open())
+            {
+                std::cout << "\nBorrowing session has been found, now displaying information..." << std::endl;
+
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+
+                file.close(); // Temporary measure
+
+            }
+            else
+            {
+                std::cout << "\nBorrowing session has not been found, recursing..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                system("CLS"); // Clear the console
+                borrowBook(individual, name, surname); // Recurse
+            }
+        }
+
         // Based on the users information, see which books they've borrowed for how long etc, if its been over 2 weeks, then charge 0.20p per day extra from that point.
 
     }
