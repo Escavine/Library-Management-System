@@ -57,7 +57,7 @@ public:
         int borrowedBooksCount = 0;
         for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
         {
-            std::ifstream checkExistingFile(individual.getName() + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt");
+            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt");
             if (checkExistingFile.is_open()) {
                 borrowedBooksCount++;
                 checkExistingFile.close(); // Close the file
@@ -184,12 +184,12 @@ public:
 
                     for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
                     {
-                        std::ifstream checkExistingFile(individual.getName() + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt");
+                        std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".txt");
 
                         if (!checkExistingFile)
                         {
                             // Create a borrow record session, embedding the individual's name and the ID for the book
-                            std::ofstream outputFile(individual.getName() + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt", std::ios::app); // Open a text file for writing 
+                            std::ofstream outputFile(name + "_" + surname + "_" + std::to_string(x) + ".txt", std::ios::app); // Open a text file for writing 
 
                             std::string line;
                             std::vector<std::string> fields; // Defining fields for the CSV 
@@ -411,32 +411,26 @@ public:
 
     }
 
-    std::string getName() const { // Retrieve the individuals name
-        return name;
-    }
 
-    std::string getSurname() const { // Retrieve the individuals surname 
-        return surname;
-    }
 
     void returnBook(user individual) // Should a user want to return a book, then this function will be executed
     {
         std::string userChoice, userChoice2;
 
-        std::cout << "Stepwise University: Returning Book" << std::endl;
+        // std::cout << "Stepwise University: Returning Book" << std::endl;
 
         // Count the number of books the user has borrowed 
-        int borrowedBooksCount = 0;
-        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
-        {
-            std::ifstream checkExistingFile(individual.getName() + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt");
-            if (checkExistingFile.is_open()) {
-                borrowedBooksCount++;
-                checkExistingFile.close(); // Close the file
-            }
-        }
+        // int borrowedBooksCount = 0;
+        // for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
+        // {
+            // std::ifstream checkExistingFile( + "_" + individual.getSurname() + "_" + std::to_string(x) + ".txt");
+            // if (checkExistingFile.is_open()) {
+                // borrowedBooksCount++;
+                // checkExistingFile.close(); // Close the file
+            // }
+        // }
 
-        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
+        // std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
 
         std::cout << "\nEnter the book ID of the book you'd like to return: ";
         std::cin >> userChoice;
@@ -452,7 +446,7 @@ public:
             clearInputBuffer(); // Clear the buffer
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
             system("CLS"); // Clear the console
-            borrowBook(individual, name, surname);
+            // borrowBook(individual, name, surname);
         }
         else
         {
@@ -531,13 +525,6 @@ public:
 
     }
 
-protected:
-    // Key attributes of a user
-    std::string name;
-    std::string surname;
-    int age;
-    std::string gender;
-    std::string email;
 };
 
 
@@ -573,10 +560,12 @@ public:
         std::cout << "Stepwise University: Student Identification\n";
 
         std::cout << "\nInput your name: ";
-        std::getline(std::cin, name);
+        std::cin >> name;
+
+        clearInputBuffer();
 
         std::cout << "\nInput your surname: ";
-        std::getline(std::cin, surname);
+        std::cin >> surname;
 
         std::ifstream findingUserOnSystem("student_" + name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
 
@@ -596,10 +585,10 @@ public:
             std::cout << "Stepwise University: Student Login\n";
 
             std::cout << "\nEnter your username: ";
-            std::getline(std::cin, username);
+            std::cin >> username;
 
             std::cout << "\nEnter your password: ";
-            std::getline(std::cin, password);
+            std::cin >> password;
 
             std::string line;
 
@@ -714,106 +703,101 @@ class librarian : user // Librarian inherits properties of a user
 public:
     void librarianLogin(int remainingChances, librarian staff)
     {
-
         if (remainingChances < 3) // Check if user has less than 3 chances
         {
             if (remainingChances == 0) // Nested selection statement to check if the chances has reached zero.
             {
                 std::cout << "Too many incorrect attempts, console will now terminate." << std::endl;
-                exit(0); // Termiante the console
+                exit(0); // Terminate the console
             }
-
             else
             {
                 std::cout << "Remaining chances: " << remainingChances << std::endl;
-
             }
-
         }
+
 
         std::string staffName, staffSurname, staffUsername, staffPassword;
 
         // Request for relevant details of the individual
-        std::cout << "Stepwise University: Student Identification\n";
+        std::cout << "Stepwise University: Staff/Librarian Identification\n";
 
         std::cout << "\nInput your name: ";
-        std::getline(std::cin, name);
+        std::cin >> staffName;
+        clearInputBuffer();
 
         std::cout << "\nInput your surname: ";
-        std::getline(std::cin, surname);
+        std::cin >> staffSurname;
 
-        std::ifstream findingUserOnSystem("student_" + name + "_" + surname + ".csv"); // Concatenate the following information to locate the given '.csv' file
+        std::ifstream findingUserOnSystem("staff_" + staffUsername + "_" + staffPassword + ".csv"); // Concatenate the following information to locate the given '.csv' file
 
         if (findingUserOnSystem.is_open())
         {
-            std::string field;
-            std::vector<std::string> fields; // Vector that will append the given values
-            std::stringstream ss(field);
-            std::vector<studentlogin> staff; // Will retain the following fields for the user (i.e. name, surname, username and password) via a vector
-
-            std::cout << "\nStudent identified." << std::endl;
+            std::cout << "\nStaff member identified" << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
             system("CLS"); // Clear the console
 
-            // Proceed with logging in the user
-            std::cout << "Stepwise University: Student Login\n";
+            // Request for relevant details of the individual
+            std::cout << "Stepwise University: Staff/Librarian Identification\n";
 
-            std::cout << "\nEnter your username: ";
+            std::cout << "\nInput your username: ";
+            std::cin >> staffUsername;
 
+            std::cout << "\nInput your password: ";
+            std::cin >> staffPassword;
 
-            std::cout << "\nEnter your password: ";
+            std::ifstream findingUserOnSystem("staff_" + staffUsername + ".csv");
 
-
-            std::string line;
-
-            while (std::getline(findingUserOnSystem, line))
+            if (findingUserOnSystem.is_open())
             {
-                std::istringstream iss(line);
+                std::string line;
 
-                // Conditions to authenticate the user, by retrieving the stored username and password from the file and comparing it to the users input
-                std::string storedFirstName, storedLastName, storedUsername, storedPassword;
-
-                if (std::getline(iss, storedFirstName, ',') &&
-                    std::getline(iss, storedLastName, ',') &&
-                    std::getline(iss, storedUsername, ',') &&
-                    std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
+                while (std::getline(findingUserOnSystem, line))
                 {
-                    if (username == storedUsername && password == storedPassword)
+                    std::istringstream iss(line);
+
+                    std::string storedUsername, storedPassword;
+
+                    if (std::getline(iss, storedUsername, ',') &&
+                        std::getline(iss, storedPassword, ',')) // Ensure all fields are properly read
                     {
-                        std::cout << "\nStudent authenticated." << std::endl;
+                        if (staffUsername == storedUsername && staffPassword == storedPassword)
+                        {
+                            std::cout << "\nStaff member authenticated." << std::endl;
+                            std::cout << "\nClick any key to go to the staff dashboard.\n" << std::endl;
 
-                        std::cout << "\nClick any key to go to the student dashboard.\n" << std::endl;
-
-                        system("pause");
-
-                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                        system("CLS"); // Clear the console
-                        person.studentDashboard(person, name, surname); // Recurse 
-
-                    }
-                    else
-                    {
-                        std::cout << "\nUsername or password not recognized, please try again." << std::endl;
-
-                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                        system("CLS"); // Clear the console
-
-                        person.studentLogin(remainingChances - 1, person); // Reduce chances, and recurse
+                            system("pause");
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                            system("CLS"); // Clear the console
+                            staff.librarianDashboard(staff, name, surname); // Redirect to the dashboard
+                        }
+                        else
+                        {
+                            std::cout << "\nUsername or password not recognized, please try again." << std::endl;
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                            system("CLS"); // Clear the console
+                            librarianLogin(remainingChances - 1, staff); // Reduce chances and recurse
+                        }
                     }
                 }
+            }
+            else
+            {
+                std::cout << "\nUnidentified individual, please try again." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+                system("CLS"); // Clear the console
+                librarianLogin(remainingChances - 1, staff);
             }
         }
         else
         {
-            std::cout << "\nUnidentified individual, please try again." << std::endl;
-
+            std::cout << "\nStaff member not recognized, please try again..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
             system("CLS"); // Clear the console
-
-            studentLogin(remainingChances - 1, person);
-
+            librarianLogin(remainingChances - 1, staff); // Recurse
         }
+
     }
 
     void registerBook(librarian staff)
@@ -927,7 +911,7 @@ public:
         std::cout << "\nYou will now be redirected to the dashboard..." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(10)); // Wait five seconds
         system("CLS"); // Clear the console
-        staff.librarianDashboard(staff); // Redirect the user
+        staff.librarianDashboard(staff, name, surname); // Redirect the user
 
     }
 
@@ -952,7 +936,7 @@ public:
 
     }
 
-    void librarianDashboard(librarian staff)
+    void librarianDashboard(librarian staff, std::string name, std::string surname)
     {
         std::string userChoice;
 
@@ -1041,7 +1025,7 @@ public:
             std::cout << "\nRedirecting user..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds for transfer
             system("CLS"); // Clear the console
-            staff.librarianDashboard(staff); // Return to dashboard
+            staff.librarianDashboard(staff, name, surname); // Return to dashboard
         }
         else if (userChoice == "5")
         {
@@ -1053,7 +1037,7 @@ public:
             std::cout << "\nInvalid input, please try again." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait three seconds
             system("CLS"); // After 3 seconds, recurse through the program to allow the individual to read the message
-            librarianDashboard(staff); // Recurse 
+            librarianDashboard(staff, name, surname); // Recurse 
         }
 
     }
