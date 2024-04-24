@@ -576,7 +576,11 @@ class user
                                 }     
 
                                 // Append the changes to the '.csv' file
-                                changeQuantity << book.bookID << "," <<
+                                for (const auto& book : books)
+                                {
+                                    changeQuantity << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
+                                        << book.remainingBooks;
+                                }
 
                             }
 
