@@ -402,7 +402,8 @@ class user
 
 
 
-        void returnBook(user individual, std::string name, std::string surname) {
+        void returnBook(user individual, std::string name, std::string surname) 
+        {
             std::string userChoice, userChoice2;
 
             std::cout << "Stepwise University: Returning Book" << std::endl;
@@ -425,7 +426,8 @@ class user
             std::cin >> userChoice;
 
             std::ifstream file(name + "_" + surname + "_" + userChoice + ".csv");
-            if (file.is_open()) {
+            if (file.is_open()) 
+            {
                 std::string line;
 
                 std::cout << "\nBorrowing session has been found, now displaying information...\n" << std::endl;
@@ -454,15 +456,9 @@ class user
 
                     // Check if the date borrowed has passed two weeks compared to current time
                 
-                    bool fineCheck = calculatingFine(name, surname, x); // Execute the given function
+                    calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not
 
-                    if (!fineCheck) // Check if the user needs pay a fine, if false, then ask the user if they'd like to return
-                    {
-                        std::cout << "Would you like to return the following book? (1 for 'yes' and any other key for 'no'): ";
-                        std::cin >> userChoice2; // Register user input
-                    }
-
-                
+            
                     if (userChoice2 == "1")
                     {
                         std::cout << "\nReturning book..." << std::endl;
@@ -498,7 +494,7 @@ class user
             }
         }
 
-        bool calculatingFine(std::string name, std::string surname, int x)
+        void calculatingFine(std::string name, std::string surname, int x)
         {
             // Insert logic for calculating a fine based on how long the book as taken for it to be returned
 
@@ -562,6 +558,7 @@ class user
             }
 
         }
+
 
 };
 
