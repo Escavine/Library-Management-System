@@ -550,7 +550,14 @@ class user
                     if (daysElapsed > MAX_BORROWING_DAYS) 
                     {
                         double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
-                        std::cout << "Fine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
+                        std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
+
+                        std::cout << "\nHow would you like to pay for your fine?" << std::endl;
+
+                        std::cout << "\n1. Cash" << std::endl;
+                        std::cout << "\n2. Card" << std::endl;
+
+                        std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
                     }
                 }
 
