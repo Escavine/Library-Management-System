@@ -499,7 +499,7 @@ class user
                     fields.push_back(field); // Append the fields in the file
                 }
 
-                if (fields.size() >= 7)
+                if (fields.size() >= 6)
                 {
                     Book book;
                     book.bookID = fields[0];
@@ -533,19 +533,43 @@ class user
                         std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
                         std::cin >> userChoice; // Register user input
 
+
+                        std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
+
                         if (userChoice == "1")
                         {
-                            std::cout << "\nCash payment accepted, book will now be returned..." << std::endl; // This section remains static as no mention of an actual payment process
-
                             // Returning book logic + creation of returned books
 
+                            std::cout << "\nCash payment accepted, book will now be returned..." << std::endl; // This section remains static as no mention of an actual payment process
 
                             std::cout << "\nReturning book..." << std::endl; // Delete the file that keeps the record of the book borrowing session
 
                             // Create a book return record and update the quantity of the following book by '+1'
+
+                            std::string line;
+
+                            while (std::getline(changeQuantity, field))
+                            {
+                                std::vector<Book> book;
+                                std::vector<std::string> fields;
+                                std::stringstream ss(field);
+
+                                while (std::getline(ss, field, ','))
+                                {
+                                    fields.push_back(field); // Append the fields in the file
+                                }
+
+                                if (fields.size() >= 6)
+                                {
+                                    Book book;
+
+                                }
+                            }
+
+
                             std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
-                            // Delete the file
+                            // Delete the file that retains the book borrowing session of the users
                             if (remove(filename.c_str()) != 0)
                             {
                                 std::perror("Error deleting borrow session file");
@@ -554,6 +578,8 @@ class user
                             {
                                 std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
                             }
+
+
 
                         }
                         else if (userChoice == "2")
