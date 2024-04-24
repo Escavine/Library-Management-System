@@ -496,7 +496,7 @@ class user
 
         void calculatingFine(std::string name, std::string surname, int x)
         {
-            // Insert logic for calculating a fine based on how long the book as taken for it to be returned
+            std::string userChoice; // Will be used to give user a choice between how to pay (i.e. cash/card)
 
             std::cout << "Checking if borrowing duration is over 2 weeks...\n" << std::endl;
         
@@ -552,12 +552,34 @@ class user
                         double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
                         std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
 
-                        std::cout << "\nHow would you like to pay for your fine?" << std::endl;
+                        std::cout << "\nHow would you like to pay for your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
 
                         std::cout << "\n1. Cash" << std::endl;
                         std::cout << "\n2. Card" << std::endl;
 
                         std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
+                        std::cin >> userChoice; // Register user input
+
+                        if (userChoice == "1")
+                        {
+                            std::cout << "\nCash payment accepted, book will now be returned..." << std::endl; // This section remains static as no mention of an actual payment process
+
+                            // Returning book logic + creation of returned books
+                        }
+                        else if (userChoice == "2")
+                        {
+                            std::cout << "\nProcessing card..." << std::endl;
+
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
+
+                            std::cout << "\nPayment accepted! Book will now be returned..." << std::endl;
+
+                            // Returning book logic + creation of returned books
+                        }
+                        else
+                        {
+                            std::cout << "\nInvalid input"
+                        }
                     }
                 }
 
