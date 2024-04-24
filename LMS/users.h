@@ -402,7 +402,7 @@ class user
 
 
 
-        void returnBook(user individual, std::string name, std::string surname) 
+        void returnBook(user individual, std::string name, std::string surname) // Function that calculates the fine, if a book has been borrowed for over 2 weeks
         {
             std::string userChoice, userChoice2;
 
@@ -531,7 +531,7 @@ class user
                     Book book;
                     book.bookID = fields[0];
                     book.bookTitle = fields[1];
-                    book.dateBorrowed = std::stoi(fields[6]);
+                    book.dateBorrowed = std::stoi(fields[6]); // Retrieve the date borrowed for the book
 
 
                     // Parse dateBorrowed into a std::tm structure
@@ -578,7 +578,11 @@ class user
                         }
                         else
                         {
-                            std::cout << "\nInvalid input"
+                            std::cout << "\nInvalid input, please try again" << std::endl;
+
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
+
+                            returnBook(individual, name, surname);
                         }
                     }
                 }
