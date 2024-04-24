@@ -550,7 +550,7 @@ class user
 
                             while (std::getline(changeQuantity, field))
                             {
-                                std::vector<Book> book;
+                                std::vector<Book> books;
                                 std::vector<std::string> fields;
                                 std::stringstream ss(field);
 
@@ -562,8 +562,22 @@ class user
                                 if (fields.size() >= 6)
                                 {
                                     Book book;
+                                    book.bookID = fields[0];
+                                    book.bookTitle = fields[1];
+                                    book.yearOfRelease = std::stoi(fields[2]);
+                                    book.bookPublisher = fields[3];
+                                    book.numberOfReleases = std::stoi(fields[4]);
+                                    book.remainingBooks = std::stoi(fields[5]);
 
-                                }
+                                    fields[5] += 1; // Increment the value by '+1' as the book is being returned
+
+                                    books.push_back(book); // Acknowledge the changes
+                                        
+                                }     
+
+                                // Append the changes to the '.csv' file
+                                changeQuantity << book.bookID << "," <<
+
                             }
 
 
