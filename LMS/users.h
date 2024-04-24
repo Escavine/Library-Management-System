@@ -433,7 +433,8 @@ class user
                 std::cout << "\nBorrowing session has been found, now displaying information...\n" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3));
 
-                while (std::getline(file, line)) {
+                while (std::getline(file, line)) 
+                {
                     std::vector<std::string> fields;
                     std::stringstream ss(line);
                     std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of Release: ", "Quantity Borrowed: ", "Remaining Quantity: ", "Borrow Date: " };
@@ -453,36 +454,8 @@ class user
                     }
 
                     std::cout << "\n"; // Spacing
-
-                    // Check if the date borrowed has passed two weeks compared to current time
-                
+     
                     calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not
-
-            
-                    if (userChoice2 == "1")
-                    {
-                        std::cout << "\nReturning book..." << std::endl;
-
-                        // Delete the file that keeps the record of the book borrowing session
-                        // Create a book return record and update the quantity of the following book by '+1'
-
-                        std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
-
-                        // Delete the file
-                        if (remove(filename.c_str()) != 0)
-                        {
-                            std::perror("Error deleting file");
-                        }
-                        else
-                        {
-                            std::cout << "File successfully deleted" << std::endl;
-                        }
-                    }
-                    else
-                    {
-                        std::cout << "\nTerminating program..." << std::endl;
-                        exit(1); // Terminate program (temp solution)
-                    }
                 }
             }
             else 
@@ -565,6 +538,23 @@ class user
                             std::cout << "\nCash payment accepted, book will now be returned..." << std::endl; // This section remains static as no mention of an actual payment process
 
                             // Returning book logic + creation of returned books
+
+
+                            std::cout << "\nReturning book..." << std::endl; // Delete the file that keeps the record of the book borrowing session
+
+                            // Create a book return record and update the quantity of the following book by '+1'
+                            std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
+
+                            // Delete the file
+                            if (remove(filename.c_str()) != 0)
+                            {
+                                std::perror("Error deleting borrow session file");
+                            }
+                            else
+                            {
+                                std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
+                            }
+
                         }
                         else if (userChoice == "2")
                         {
@@ -581,8 +571,9 @@ class user
                             std::cout << "\nInvalid input, please try again" << std::endl;
 
                             std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
+                            system("CLS"); // Clear the console
 
-                            returnBook(individual, name, surname);
+                            calculatingFine(name, surname, x); // Recurse
                         }
                     }
                 }
