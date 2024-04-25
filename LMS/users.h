@@ -25,541 +25,245 @@ struct stafflogin {
 // Defines all users (i.e. students and librarians)
 class user
 {
-    public:
-        void clearInputBuffer()
+public:
+    void clearInputBuffer()
+    {
+        std::cin.clear(); // Clear the input
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
+    }
+
+    void borrowBook(user individual, std::string name, std::string surname) // This is dynamic and can be a teacher/student
+    {
+        std::string userInput;
+        std::string inputBookID;
+
+        // Check if there's any books registered in the system, should there not be any books, return user to the menu
+
+        std::cout << "Stepwise University: Checking for existence of books\n";
+
+        std::ifstream checkExist("RegisteredBooks.csv"); // Read from the file
+
+        if (!checkExist)
         {
-            std::cin.clear(); // Clear the input
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard any input buffers
+            std::cout << "\nNo books are currently registered on the system..." << std::endl;
+            exit(1); // Temporary measure to deal with non-existing books
         }
 
-        void borrowBook(user individual, std::string name, std::string surname) // This is dynamic and can be a teacher/student
+        system("CLS"); // Clear the console, should there be books present
+
+        std::cout << "Stepwise University: Borrowing a Book\n";
+
+        // Count the number of books the user has borrowed prior
+        int borrowedBooksCount = 0;
+        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
         {
-            std::string userInput;
-            std::string inputBookID;
-
-            // Check if there's any books registered in the system, should there not be any books, return user to the menu
-
-            std::cout << "Stepwise University: Checking for existence of books\n";
-
-            std::ifstream checkExist("RegisteredBooks.csv"); // Read from the file
-
-            if (!checkExist)
-            {
-                std::cout << "\nNo books are currently registered on the system..." << std::endl;
-                exit(1); // Temporary measure to deal with non-existing books
+            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
+            if (checkExistingFile.is_open()) {
+                borrowedBooksCount++;
+                checkExistingFile.close(); // Close the file
             }
+        }
 
-            system("CLS"); // Clear the console, should there be books present
+        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << "\n";
+
+        std::cout << "\n1. Borrow a book via Book ID" << std::endl;
+        std::cout << "\n2. Check the current books registered on the system" << std::endl;
+
+        std::cout << "\nSelect an option: ";
+        std::cin >> userInput; // Register user input
+
+        if (userInput == "1")
+        {
+            std::cout << "\nRedirecting user..." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            clearInputBuffer();
+            system("CLS");
 
             std::cout << "Stepwise University: Borrowing a Book\n";
 
-            // Count the number of books the user has borrowed prior
-            int borrowedBooksCount = 0;
-            for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
+            std::cout << "\nEnter the book ID for the book you'd like to borrow (format xxx-xxx-xxx): ";
+            std::cin >> inputBookID; // Register the input
+
+            // Open CSV file to load the books that are available in the library
+            std::ifstream file(inputBookID + ".csv"); // Open the .CSV file, which contains the given book based on the book ID
+
+            if (!file.is_open())
             {
-                std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
-                if (checkExistingFile.is_open()) {
-                    borrowedBooksCount++;
-                    checkExistingFile.close(); // Close the file
-                }
+                std::cerr << "\nCannot find book." << std::endl;
+                clearInputBuffer(); // Clear the buffer
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
+                system("CLS"); // Clear the console
+                borrowBook(individual, name, surname);
             }
-
-            std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << "\n";
-
-            std::cout << "\n1. Borrow a book via Book ID" << std::endl;
-            std::cout << "\n2. Check the current books registered on the system" << std::endl;
-
-            std::cout << "\nSelect an option: ";
-            std::cin >> userInput; // Register user input
-
-            if (userInput == "1")
+            else
             {
-                std::cout << "\nRedirecting user..." << std::endl;
+                std::string confirmUserBorrow;
 
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                clearInputBuffer();
-                system("CLS");
+                // Logic for displaying book information
 
-                std::cout << "Stepwise University: Borrowing a Book\n";
+                std::string line; // string for iterating file
+                std::vector<Book> bookQuantityCheck; // Vector for checking the quantity of the current books availiable
 
-                std::cout << "\nEnter the book ID for the book you'd like to borrow (format xxx-xxx-xxx): ";
-                std::cin >> inputBookID; // Register the input
 
-                // Open CSV file to load the books that are available in the library
-                std::ifstream file(inputBookID + ".csv"); // Open the .CSV file, which contains the given book based on the book ID
-
-                if (!file.is_open())
+                while (std::getline(file, line))
                 {
-                    std::cerr << "\nCannot find book." << std::endl;
-                    clearInputBuffer(); // Clear the buffer
-                    std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
-                    system("CLS"); // Clear the console
-                    borrowBook(individual, name, surname);
-                }
-                else
-                {
-                    std::string confirmUserBorrow;
-
-                    // Logic for displaying book information
-
-                    std::string line; // string for iterating file
-                    std::vector<Book> bookQuantityCheck; // Vector for checking the quantity of the current books availiable
-
-
-                    while (std::getline(file, line))
-                    {
-                        std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: " };
-                        // Create stringstream from line
-                        std::stringstream ss(line);
-                        std::string field; // Defining a single field for the '.csv'
-                        std::vector<std::string> fields; // Defining fields for the '.csv' 
-
-                        while (std::getline(ss, field, ',')) // Parse each field of the line
-                        {
-                            fields.push_back(field); // Append per field to the vector
-                        }
-
-                        if (fields.size() >= 6)
-                        {
-                            Book book;
-                            book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
-                            book.bookID = fields[0];
-                            book.bookTitle = fields[1];
-                            book.yearOfRelease = std::stoi(fields[2]);
-                            book.bookPublisher = fields[3];
-                            book.remainingBooks = std::stoi(fields[5]);
-
-                            // Check if the book quantity is '0'
-                            if (book.remainingBooks == 0)
-                            {
-                                std::cout << "\nThis book is currently not available, please try again." << std::endl;
-                                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
-                                individual.clearInputBuffer(); // Clean the input buffer to prevent issues
-
-                                system("CLS"); // Clear console
-                                individual.borrowBook(individual, name, surname); // Recurse, allowing for the user to pick a different book
-
-                            }
-                            else
-                            {
-                                std::cout << "\nFound book!\n" << std::endl;
-
-                                for (int i = 0; i < order.size();)
-                                {
-                                    for (int f = 0; f < fields.size();)
-                                    {
-                                        std::cout << order[i] << fields[f] << " ";
-                                        i += 1;
-                                        f += 1;
-                                        std::cout << "\n";
-                                    }
-                                }
-                                std::cout << std::endl;
-                            }
-
-                            bookQuantityCheck.push_back(book);
-                        }
-
-                    }
-
-                    std::cout << "Would you like to borrow this book? (1 for 'yes' and any other key for 'no'): ";
-                    std::cin >> confirmUserBorrow;
-
-
-                    if (confirmUserBorrow == "1")
-                    {
-                        file.clear(); // Clear the previous errors with the file
-                        file.seekg(0); // Reset file pointer to the beginnning
-
-
-                        time_t localTime; // Retrieve local time
-                        time(&localTime);
-
-                        char dt[100]; // Store the following information from 'strftime' into 'dt'
-
-                        // Format the date and time into string format using strftime
-                        strftime(dt, sizeof(dt), "%d/%m/%Y", localtime(&localTime));
-
-                        // Files are created linearly, check if previous linear files exist and create a new borrowing session based on that (i.e. file structure: name + surname + number starting from 1,2,3,4....)
-
-                        for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
-                        {
-                            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
-
-                            if (!checkExistingFile)
-                            {
-                                // Create a borrow record session, embedding the individual's name and the ID for the book
-                                std::ofstream outputFile(name + "_" + surname + "_" + std::to_string(x) + ".csv", std::ios::app); // Open a text file for writing 
-
-                                std::string line;
-                                std::vector<std::string> fields; // Defining fields for the CSV 
-                                std::vector<Book> books; // Vector for updating the remaining book value with the 'book' structure as the data type
-
-
-                                while (std::getline(file, line))
-                                {
-                                    // Create stringstream from line
-                                    std::stringstream ss(line);
-                                    std::string field; // Defining a single field for the CSV
-                                    std::vector<std::string> fields; // Defining fields for the CSV 
-
-                                    while (std::getline(ss, field, ',')) // Parse each field of the line
-                                    {
-                                        fields.push_back(field); // Append per field to the vector
-                                    }
-
-
-                                    if (fields.size() >= 6)
-                                    {
-                                        Book book;
-
-                                        book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
-
-                                        book.bookID = fields[0];
-                                        book.bookTitle = fields[1];
-                                        book.yearOfRelease = std::stoi(fields[2]);
-                                        book.bookPublisher = fields[3];
-                                        book.remainingBooks = std::stoi(fields[5]);
-
-                                        // Deduct the book linearly
-                                        if (book.remainingBooks > 0)
-                                        {
-                                            book.remainingBooks -= 1;
-                                        }
-
-                                        books.push_back(book);
-                                    }
-
-
-                                    for (const auto& book : books)
-                                    {
-                                        outputFile << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
-                                            << book.quantityBorrowed << "," << book.remainingBooks << "," << dt << "\n"; // Adhere strictly to '.csv' format
-                                    }
-
-                                }
-
-                                file.clear(); // Clear the previous errors with the file
-                                file.seekg(0); // Reset file pointer
-
-                                std::ifstream fileUpdate(inputBookID + ".csv"); // Open the .CSV file for writing
-                                std::vector<Book> booksUpdate; // Vector for updating book information
-
-                                std::string lineUpdate;
-                                while (std::getline(fileUpdate, lineUpdate))
-                                {
-                                    // Create stringstream from line
-                                    std::stringstream ss(lineUpdate);
-                                    std::string field; // Defining a single field for the CSV
-                                    std::vector<std::string> fields; // Defining fields for the CSV 
-
-                                    // Parse each field of the line
-                                    while (std::getline(ss, field, ','))
-                                    {
-                                        fields.push_back(field); // Append per field to the vector
-                                    }
-
-                                    // Check if there are enough fields to process
-                                    if (fields.size() >= 6)
-                                    {
-                                        Book book;
-                                        book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
-                                        book.bookID = fields[0];
-                                        book.bookTitle = fields[1];
-                                        book.yearOfRelease = std::stoi(fields[2]);
-                                        book.bookPublisher = fields[3];
-                                        book.numberOfReleases = std::stoi(fields[4]);
-                                        book.remainingBooks = std::stoi(fields[5]);
-
-                                        // Deduct the book linearly from the '.csv' file itself
-                                        if (book.remainingBooks > 0)
-                                        {
-                                            book.remainingBooks -= 1;
-                                        }
-
-                                        booksUpdate.push_back(book);
-                                    }
-                                
-                                    fileUpdate.close(); // Close the instance 
-
-                                    std::ofstream updatedFile(inputBookID + ".csv"); // For writing
-
-                                    if (!updatedFile)
-                                    {
-                                        std::cout << "\nUnable to open file for writing..." << std::endl;
-                                        exit(1);
-                                    }
-
-                                    // Write the updated book information back to the file
-                                    for (const auto& book : booksUpdate)
-                                    {
-                                        updatedFile << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
-                                            << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n";
-                                    }
-                                }
-
-                                exit(1); // Terminate to mitigate future issues (temp solution)
-
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        std::string userChoice;
-                        std::cout << "\nWould you like to borrow another book or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard): ";
-                        std::getline(std::cin, userChoice); // Retrieve user input
-
-                        if (userChoice == "1")
-                        {
-                            std::cout << "\nRedirecting user to borrow another book..." << std::endl;
-                            std::this_thread::sleep_for(std::chrono::seconds(3));
-                            system("CLS");
-                            clearInputBuffer();
-                            borrowBook(individual, name, surname);
-                        }
-                        else
-                        {
-                            std::cout << "\nRedirecting user to the dashboard..." << std::endl;
-                            std::this_thread::sleep_for(std::chrono::seconds(3));
-                            system("CLS");
-                            clearInputBuffer();
-
-                            // Check if the user is a 'librarian' or 'student'
-                        }
-                    }
-
-                }
-
-                file.close();
-
-            }
-            else if (userInput == "2")
-            {
-                std::cout << "\nRedirecting user..." << std::endl;
-
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                clearInputBuffer();
-                system("CLS");
-
-                std::cout << "Current books registered on the system: " << "\n" << std::endl; // Numerous books can be registered on the system
-
-                std::string line;
-                std::vector<Book> bookRegistering; // Vector for displaying the number of books available
-
-                while (std::getline(checkExist, line))
-                {
-                    std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: " }; // Contains all relevant information for the book
+                    std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: ", "Available Copies in the Library: " };
+                    // Create stringstream from line
                     std::stringstream ss(line);
-                    std::string field;
-                    std::vector<std::string> fields; // Will contain the appended information for the book
+                    std::string field; // Defining a single field for the '.csv'
+                    std::vector<std::string> fields; // Defining fields for the '.csv' 
 
-                    while (std::getline(ss, field, ',')) // ',' is the delimiter
+                    while (std::getline(ss, field, ',')) // Parse each field of the line
                     {
-                        fields.push_back(field); // Append the following information to the vector
+                        fields.push_back(field); // Append per field to the vector
                     }
 
-                    if (fields.size() == order.size()) // Ensure both vectors have the same size            
+                    if (fields.size() >= 6)
                     {
                         Book book;
+                        book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
                         book.bookID = fields[0];
                         book.bookTitle = fields[1];
                         book.yearOfRelease = std::stoi(fields[2]);
                         book.bookPublisher = fields[3];
-                        book.numberOfReleases = std::stoi(fields[4]);
+                        book.remainingBooks = std::stoi(fields[5]);
 
-                        // Print book information
-                        for (int i = 0; i < order.size(); ++i)
+                        // Check if the book quantity is '0'
+                        if (book.remainingBooks == 0)
                         {
-                            std::cout << order[i] << fields[i] << "\n";
+                            std::cout << "\nThis book is currently not available, please try again." << std::endl;
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before allowing user to borrow a book
+                            individual.clearInputBuffer(); // Clean the input buffer to prevent issues
+
+                            system("CLS"); // Clear console
+                            individual.borrowBook(individual, name, surname); // Recurse, allowing for the user to pick a different book
+
                         }
-                        std::cout << std::endl;
-                    }
-
-                }
-
-                std::cout << "\nFor any information regarding the quantity of remaining books in the library, kindly return to the borrowing menu, click the option to find the book ID and input the given book." << std::endl;
-
-                std::cout << "\nPlease enter any key to return to borrowing a book: ";
-                system("\npause"); // Register user input
-
-                std::cout << "\nRedirecting user..." << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
-                borrowBook(individual, name, surname); // Recurse
-            }
-            else
-            {
-                std::cout << "\nInvalid input, please try again." << std::endl;
-                clearInputBuffer(); // Clear the buffer
-                system("CLS"); // Clear the console
-                borrowBook(individual, name, surname); // Recurse
-            }
-
-         
-
-
-        }
-
-
-
-        void returnBook(user individual, std::string name, std::string surname) // Function that calculates the fine, if a book has been borrowed for over 2 weeks
-        {
-            std::string userChoice, userChoice2;
-
-            std::cout << "Stepwise University: Returning Book" << std::endl;
-
-            // Count the number of books the user has borrowed 
-            int borrowedBooksCount = 0;
-            int x = 1; // This has intentionally designed to be placed out of the loop, that way it can be used to find the given file and determine if the user has borrowed a book for over 2 weeks
-
-            for (x; x <= MAX_FILES_TO_CHECK; ++x) {
-                std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
-                if (checkExistingFile.is_open()) {
-                    borrowedBooksCount++;
-                    checkExistingFile.close();
-                }
-            }
-
-            std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
-
-            std::cout << "\nEnter the number of the book you'd like to return (i.e. the first book, then 1, the second book 2 etc...): ";
-            std::cin >> userChoice;
-
-            std::ifstream file(name + "_" + surname + "_" + userChoice + ".csv");
-            if (file.is_open()) 
-            {
-                std::string line;
-
-                std::cout << "\nBorrowing session has been found, now displaying information...\n" << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(3));
-
-                while (std::getline(file, line)) 
-                {
-                    std::vector<std::string> fields;
-                    std::stringstream ss(line);
-                    std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of Release: ", "Quantity Borrowed: ", "Remaining Quantity: ", "Borrow Date: " };
-                    std::string field;
-                    while (std::getline(ss, field, ',')) {
-                        fields.push_back(field);
-                    }
-
-                    for (int x = 0; x < order.size();)
-                    {
-                        for (int i = 0; i < fields.size();) {
-                            std::cout << order[x] << fields[i] << " ";
-                            x += 1;
-                            i += 1;
-                            std::cout << "\n";
-                        }
-                    }
-
-                    std::cout << "\n"; // Spacing
-     
-                    calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not
-                }
-            }
-            else 
-            {
-                std::cout << "\nBorrowing session has not been found." << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
-                system("CLS"); // Clear console
-                returnBook(individual, name, surname); // Recurse
-            }
-        }
-
-        void calculatingFine(std::string name, std::string surname, int x)
-        {
-            std::string userChoice; // Will be used to give user a choice between how to pay (i.e. cash/card)
-
-            std::cout << "Checking if borrowing duration is over 2 weeks...\n" << std::endl;
-        
-            // Retrieve local time
-            time_t currentTime;
-            time(&currentTime);
-
-            // Convert current time to string format
-            char currentDate[100];
-            strftime(currentDate, sizeof(currentDate), "%d/%m/%Y", localtime(&currentTime));
-
-            // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
-
-            std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
-
-            std::string field;
-
-            while (std::getline(dateSearchForBook, field))
-            {
-                std::vector<Book> book;
-                std::vector<std::string> fields;
-                std::stringstream ss(field);
-
-                while (std::getline(ss, field, ','))
-                {
-                    fields.push_back(field); // Append the fields in the file
-                }
-
-                if (fields.size() >= 6)
-                {
-                    Book book;
-                    book.bookID = fields[0];
-                    book.bookTitle = fields[1];
-                    book.dateBorrowed = std::stoi(fields[6]); // Retrieve the date borrowed for the book
-
-                    // Parse dateBorrowed into a std::tm structure
-                    std::tm borrowTime = {};
-                    std::istringstream(book.dateBorrowed) >> std::get_time(&borrowTime, "%d/%m/%Y");
-
-                    // Convert std::tm structure to time_t
-                    time_t borrowTimestamp = mktime(&borrowTime);
-
-                    // Calculate borrowing duration in days
-                    double secondsElapsed = difftime(currentTime, borrowTimestamp);
-                    int daysElapsed = static_cast<int>(secondsElapsed / (60 * 60 * 24));
-
-                    // Check if borrowing duration exceeds two weeks
-                    const int MAX_BORROWING_DAYS = 14;
-                    if (daysElapsed > MAX_BORROWING_DAYS) 
-                    {
-                        double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
-                        std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
-
-                        std::cout << "\nHow would you like to pay for your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
-
-                        std::cout << "\n1. Cash" << std::endl;
-                        std::cout << "\n2. Card" << std::endl;
-
-                        std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
-                        std::cin >> userChoice; // Register user input
-
-
-                        std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
-
-                        if (userChoice == "1")
+                        else
                         {
-                            // Returning book logic + creation of returned books
+                            std::cout << "\nFound book!\n" << std::endl;
 
-                            std::cout << "\nCash payment accepted, book will now be returned..." << std::endl; // This section remains static as no mention of an actual payment process
+                            for (int i = 0; i < order.size();)
+                            {
+                                for (int f = 0; f < fields.size();)
+                                {
+                                    std::cout << order[i] << fields[f] << " ";
+                                    i += 1;
+                                    f += 1;
+                                    std::cout << "\n";
+                                }
+                            }
+                            std::cout << std::endl;
+                        }
 
-                            std::cout << "\nReturning book..." << std::endl; // Delete the file that keeps the record of the book borrowing session
+                        bookQuantityCheck.push_back(book);
+                    }
 
-                            // Create a book return record and update the quantity of the following book by '+1'
+                }
+
+                std::cout << "Would you like to borrow this book? (1 for 'yes' and any other key for 'no'): ";
+                std::cin >> confirmUserBorrow;
+
+
+                if (confirmUserBorrow == "1")
+                {
+                    file.clear(); // Clear the previous errors with the file
+                    file.seekg(0); // Reset file pointer to the beginnning
+
+
+                    time_t localTime; // Retrieve local time
+                    time(&localTime);
+
+                    char dt[100]; // Store the following information from 'strftime' into 'dt'
+
+                    // Format the date and time into string format using strftime
+                    strftime(dt, sizeof(dt), "%d/%m/%Y", localtime(&localTime));
+
+                    // Files are created linearly, check if previous linear files exist and create a new borrowing session based on that (i.e. file structure: name + surname + number starting from 1,2,3,4....)
+
+                    for (int x = 1; x <= MAX_FILES_TO_CHECK; ++x)
+                    {
+                        std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
+
+                        if (!checkExistingFile)
+                        {
+                            // Create a borrow record session, embedding the individual's name and the ID for the book
+                            std::ofstream outputFile(name + "_" + surname + "_" + std::to_string(x) + ".csv", std::ios::app); // Open a text file for writing 
 
                             std::string line;
+                            std::vector<std::string> fields; // Defining fields for the CSV 
+                            std::vector<Book> books; // Vector for updating the remaining book value with the 'book' structure as the data type
 
-                            while (std::getline(changeQuantity, field))
+
+                            while (std::getline(file, line))
                             {
-                                std::vector<Book> books;
-                                std::vector<std::string> fields;
-                                std::stringstream ss(field);
+                                // Create stringstream from line
+                                std::stringstream ss(line);
+                                std::string field; // Defining a single field for the CSV
+                                std::vector<std::string> fields; // Defining fields for the CSV 
 
-                                while (std::getline(ss, field, ','))
+                                while (std::getline(ss, field, ',')) // Parse each field of the line
                                 {
-                                    fields.push_back(field); // Append the fields in the file
+                                    fields.push_back(field); // Append per field to the vector
                                 }
+
 
                                 if (fields.size() >= 6)
                                 {
                                     Book book;
+
+                                    book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
+
+                                    book.bookID = fields[0];
+                                    book.bookTitle = fields[1];
+                                    book.yearOfRelease = std::stoi(fields[2]);
+                                    book.bookPublisher = fields[3];
+                                    book.remainingBooks = std::stoi(fields[5]);
+
+                                    // Deduct the book linearly
+                                    if (book.remainingBooks > 0)
+                                    {
+                                        book.remainingBooks -= 1;
+                                    }
+
+                                    books.push_back(book);
+                                }
+
+
+                                for (const auto& book : books)
+                                {
+                                    outputFile << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
+                                        << book.quantityBorrowed << "," << book.remainingBooks << "," << dt << "\n"; // Adhere strictly to '.csv' format
+                                }
+
+                            }
+
+                            file.clear(); // Clear the previous errors with the file
+                            file.seekg(0); // Reset file pointer
+
+                            std::ifstream fileUpdate(inputBookID + ".csv"); // Open the .CSV file for writing
+                            std::vector<Book> booksUpdate; // Vector for updating book information
+
+                            std::string lineUpdate;
+                            while (std::getline(fileUpdate, lineUpdate))
+                            {
+                                // Create stringstream from line
+                                std::stringstream ss(lineUpdate);
+                                std::string field; // Defining a single field for the CSV
+                                std::vector<std::string> fields; // Defining fields for the CSV 
+
+                                // Parse each field of the line
+                                while (std::getline(ss, field, ','))
+                                {
+                                    fields.push_back(field); // Append per field to the vector
+                                }
+
+                                // Check if there are enough fields to process
+                                if (fields.size() >= 6)
+                                {
+                                    Book book;
+                                    book.quantityBorrowed = 1; // Set the quantity to '1' book borrowed
                                     book.bookID = fields[0];
                                     book.bookTitle = fields[1];
                                     book.yearOfRelease = std::stoi(fields[2]);
@@ -567,75 +271,355 @@ class user
                                     book.numberOfReleases = std::stoi(fields[4]);
                                     book.remainingBooks = std::stoi(fields[5]);
 
-                                    fields[5] += 1; // Increment the value by '+1' as the book is being returned
+                                    // Deduct the book linearly from the '.csv' file itself
+                                    if (book.remainingBooks > 0)
+                                    {
+                                        book.remainingBooks -= 1;
+                                    }
 
-                                    books.push_back(book); // Acknowledge the changes
-                                        
-                                } 
-
-                                std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
-
-                                // Append the changes to the '.csv' file via 'ofstream'
-                                for (const auto& book : books)
-                                {
-                                    pushQuantityChange << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
-                                        << book.remainingBooks;
+                                    booksUpdate.push_back(book);
                                 }
-                                
-                                pushQuantityChange.close(); // Once changes are made, safely close the file to mitigate issues
 
-                                // Creation of a new file, or writing on this file should it already exist
-                                std::ofstream returnedBooks("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
+                                fileUpdate.close(); // Close the instance 
 
-                                returnedBooks << name << "," << surname << "," << book.bookID << "," << book.bookTitle << "\n"; // Append the changes into the '.csv' file the '\n' is for every new return
+                                std::ofstream updatedFile(inputBookID + ".csv"); // For writing
 
-                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                                if (!updatedFile)
+                                {
+                                    std::cout << "\nUnable to open file for writing..." << std::endl;
+                                    exit(1);
+                                }
 
+                                // Write the updated book information back to the file
+                                for (const auto& book : booksUpdate)
+                                {
+                                    updatedFile << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << ","
+                                        << book.bookPublisher << "," << book.numberOfReleases << "," << book.remainingBooks << "\n";
+                                }
                             }
 
-
-                            std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
-
-                            // Delete the file that retains the book borrowing session of the users
-                            if (remove(filename.c_str()) != 0)
-                            {
-                                std::perror("Error deleting borrow session file");
-                            }
-                            else
-                            {
-                                std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
-                            }
-
-
+                            exit(1); // Terminate to mitigate future issues (temp solution)
 
                         }
-                        else if (userChoice == "2")
-                        {
-                            std::cout << "\nProcessing card..." << std::endl;
+                    }
 
-                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
+                }
+                else
+                {
+                    std::string userChoice;
+                    std::cout << "\nWould you like to borrow another book or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard): ";
+                    std::getline(std::cin, userChoice); // Retrieve user input
 
-                            std::cout << "\nPayment accepted! Book will now be returned..." << std::endl;
+                    if (userChoice == "1")
+                    {
+                        std::cout << "\nRedirecting user to borrow another book..." << std::endl;
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        system("CLS");
+                        clearInputBuffer();
+                        borrowBook(individual, name, surname);
+                    }
+                    else
+                    {
+                        std::cout << "\nRedirecting user to the dashboard..." << std::endl;
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        system("CLS");
+                        clearInputBuffer();
 
-                            // Returning book logic + creation of returned books
-                        }
-                        else
-                        {
-                            std::cout << "\nInvalid input, please try again" << std::endl;
-
-                            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
-                            system("CLS"); // Clear the console
-
-                            calculatingFine(name, surname, x); // Recurse
-                        }
+                        // Check if the user is a 'librarian' or 'student'
                     }
                 }
 
-                // Check if the date borrowed has exceeded 2 weeks
             }
 
+            file.close();
+
+        }
+        else if (userInput == "2")
+        {
+            std::cout << "\nRedirecting user..." << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            clearInputBuffer();
+            system("CLS");
+
+            std::cout << "Current books registered on the system: " << "\n" << std::endl; // Numerous books can be registered on the system
+
+            std::string line;
+            std::vector<Book> bookRegistering; // Vector for displaying the number of books available
+
+            while (std::getline(checkExist, line))
+            {
+                std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of release: ", "Author: ", "Worldwide Releases: " }; // Contains all relevant information for the book
+                std::stringstream ss(line);
+                std::string field;
+                std::vector<std::string> fields; // Will contain the appended information for the book
+
+                while (std::getline(ss, field, ',')) // ',' is the delimiter
+                {
+                    fields.push_back(field); // Append the following information to the vector
+                }
+
+                if (fields.size() == order.size()) // Ensure both vectors have the same size            
+                {
+                    Book book;
+                    book.bookID = fields[0];
+                    book.bookTitle = fields[1];
+                    book.yearOfRelease = std::stoi(fields[2]);
+                    book.bookPublisher = fields[3];
+                    book.numberOfReleases = std::stoi(fields[4]);
+
+                    // Print book information
+                    for (int i = 0; i < order.size(); ++i)
+                    {
+                        std::cout << order[i] << fields[i] << "\n";
+                    }
+                    std::cout << std::endl;
+                }
+
+            }
+
+            std::cout << "\nFor any information regarding the quantity of remaining books in the library, kindly return to the borrowing menu, click the option to find the book ID and input the given book." << std::endl;
+
+            std::cout << "\nPlease enter any key to return to borrowing a book: ";
+            system("\npause"); // Register user input
+
+            std::cout << "\nRedirecting user..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before reattempt
+            borrowBook(individual, name, surname); // Recurse
+        }
+        else
+        {
+            std::cout << "\nInvalid input, please try again." << std::endl;
+            clearInputBuffer(); // Clear the buffer
+            system("CLS"); // Clear the console
+            borrowBook(individual, name, surname); // Recurse
         }
 
+
+
+
+    }
+
+
+
+    void returnBook(user individual, std::string name, std::string surname) // Function that calculates the fine, if a book has been borrowed for over 2 weeks
+    {
+        std::string userChoice, userChoice2;
+
+        std::cout << "Stepwise University: Returning Book" << std::endl;
+
+        // Count the number of books the user has borrowed 
+        int borrowedBooksCount = 0;
+        int x = 1; // This has intentionally designed to be placed out of the loop, that way it can be used to find the given file and determine if the user has borrowed a book for over 2 weeks
+
+        for (x; x <= MAX_FILES_TO_CHECK; ++x) {
+            std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
+            if (checkExistingFile.is_open()) {
+                borrowedBooksCount++;
+                checkExistingFile.close();
+            }
+        }
+
+        std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
+
+        std::cout << "\nEnter the number of the book you'd like to return (i.e. the first book, then 1, the second book 2 etc...): ";
+        std::cin >> userChoice;
+
+        std::ifstream file(name + "_" + surname + "_" + userChoice + ".csv");
+        if (file.is_open())
+        {
+            std::string line;
+
+            std::cout << "\nBorrowing session has been found, now displaying information...\n" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+
+            while (std::getline(file, line))
+            {
+                std::vector<std::string> fields;
+                std::stringstream ss(line);
+                std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Year of Release: ", "Quantity Borrowed: ", "Remaining Quantity: ", "Borrow Date: " };
+                std::string field;
+                while (std::getline(ss, field, ',')) {
+                    fields.push_back(field);
+                }
+
+                for (int x = 0; x < order.size();)
+                {
+                    for (int i = 0; i < fields.size();) {
+                        std::cout << order[x] << fields[i] << " ";
+                        x += 1;
+                        i += 1;
+                        std::cout << "\n";
+                    }
+                }
+
+                std::cout << "\n"; // Spacing
+
+                calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not
+            }
+        }
+        else
+        {
+            std::cout << "\nBorrowing session has not been found." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds
+            system("CLS"); // Clear console
+            returnBook(individual, name, surname); // Recurse
+        }
+    }
+
+    void calculatingFine(std::string name, std::string surname, int x)
+    {
+        std::string userChoice; // Will be used to give user a choice between how to pay (i.e. cash/card)
+
+        std::cout << "Checking if borrowing duration is over 2 weeks...\n" << std::endl;
+
+        // Retrieve local time
+        time_t currentTime;
+        time(&currentTime);
+
+        // Convert current time to string format
+        char currentDate[100];
+        strftime(currentDate, sizeof(currentDate), "%d/%m/%Y", localtime(&currentTime));
+
+        // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
+
+        std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
+
+        std::string field;
+
+        while (std::getline(dateSearchForBook, field))
+        {
+            std::vector<Book> book;
+            std::vector<std::string> fields;
+            std::stringstream ss(field);
+
+            while (std::getline(ss, field, ','))
+            {
+                fields.push_back(field); // Append the fields in the file
+            }
+
+            if (fields.size() >= 7)
+            {
+                Book book;
+                book.bookID = fields[0];
+                book.bookTitle = fields[1];
+                book.dateBorrowed = std::stoi(fields[6]); // Retrieve the date borrowed for the book
+
+                // Parse dateBorrowed into a std::tm structure
+                std::tm borrowTime = {};
+                std::istringstream(book.dateBorrowed) >> std::get_time(&borrowTime, "%d/%m/%Y");
+
+                // Convert std::tm structure to time_t
+                time_t borrowTimestamp = mktime(&borrowTime);
+
+                // Calculate borrowing duration in days
+                double secondsElapsed = difftime(currentTime, borrowTimestamp);
+                int daysElapsed = static_cast<int>(secondsElapsed / (60 * 60 * 24));
+
+                // Check if borrowing duration exceeds two weeks
+                const int MAX_BORROWING_DAYS = 14;
+                if (daysElapsed > MAX_BORROWING_DAYS)
+                {
+                    double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
+                    std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
+
+                    std::cout << "\nHow would you like to pay for your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
+
+                    std::cout << "\n1. Cash" << std::endl;
+                    std::cout << "\n2. Card" << std::endl;
+
+                    std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
+                    std::cin >> userChoice; // Register user input
+
+
+                    std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
+
+                    if (userChoice == "1" || userChoice == "2")
+                    {
+                        // Returning book logic + creation of returned books
+
+                        std::cout << "\nPayment is being processed..." << std::endl; // This section remains static as no mention of an actual payment process
+
+                        std::cout << "\nReturning book..." << std::endl; // Delete the file that keeps the record of the book borrowing session
+
+                        // Create a book return record and update the quantity of the following book by '+1'
+
+                        std::string line;
+
+                        while (std::getline(changeQuantity, field))
+                        {
+                            std::vector<Book> books;
+                            std::vector<std::string> fields;
+                            std::stringstream ss(field);
+
+                            while (std::getline(ss, field, ','))
+                            {
+                                fields.push_back(field); // Append the fields in the file
+                            }
+
+                            if (fields.size() >= 6)
+                            {
+                                Book book;
+                                book.bookID = fields[0];
+                                book.bookTitle = fields[1];
+                                book.yearOfRelease = std::stoi(fields[2]);
+                                book.bookPublisher = fields[3];
+                                book.numberOfReleases = std::stoi(fields[4]);
+                                book.remainingBooks = std::stoi(fields[5]);
+
+                                fields[5] += 1; // Increment the value by '+1' as the book is being returned
+
+                                books.push_back(book); // Acknowledge the changes
+
+                            }
+
+                            std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
+
+                            // Append the changes to the '.csv' file via 'ofstream'
+                            for (const auto& book : books)
+                            {
+                                pushQuantityChange << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
+                                    << book.remainingBooks;
+                            }
+
+                            pushQuantityChange.close(); // Once changes are made, safely close the file to mitigate issues
+
+                            // Creation of a new file, or writing on this file should it already exist
+                            std::ofstream returnedBooks("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
+
+                            returnedBooks << name << "," << surname << "," << book.bookID << "," << book.bookTitle << "\n"; // Append the changes into the '.csv' file the '\n' is for every new return
+
+                            std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                            std::cout << "\nPayment success!" << std::endl;
+
+                        }
+
+                        // Delete the file that retains the book borrowing session of the users
+                        std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
+
+                        if (remove(filename.c_str()) != 0)
+                        {
+                            std::perror("Error deleting borrow session file");
+                        }
+                        else
+                        {
+                            std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
+                        }
+                    }
+                    else
+                    {
+                        std::cout << "\nInvalid input, please try again" << std::endl;
+
+                        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds (aesthetic purposes)
+                        system("CLS"); // Clear the console
+
+                        calculatingFine(name, surname, x); // Recurse
+                    }
+                }
+            }
+        }
+
+    }
 
 };
 
