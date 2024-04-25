@@ -573,12 +573,16 @@ class user
 
                                     books.push_back(book); // Acknowledge the changes
                                         
-                                }     
+                                } 
 
-                                // Append the changes to the '.csv' file
+                                changeQuantity.close(); // Close the given file once modifications have been made
+
+                                std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
+
+                                // Append the changes to the '.csv' file via 'ofstream'
                                 for (const auto& book : books)
                                 {
-                                    changeQuantity << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
+                                    pushQuantityChange << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
                                         << book.remainingBooks;
                                 }
 
