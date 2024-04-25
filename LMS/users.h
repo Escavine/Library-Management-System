@@ -1,8 +1,11 @@
 #pragma once
+
+// All relevant libraries
 #include <chrono>
 #include <iomanip>
 
 const int MAX_FILES_TO_CHECK = 100; // Will be used to check for number of books borrowed, and '100' is the set limit
+const int MAX_BORROWING_DAYS = 14; // Max borrowing days is set to '14' (2 weeks)
 
 // Structure for a book
 struct Book {
@@ -455,7 +458,7 @@ public:
 
                 std::cout << "\n"; // Spacing
 
-                calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not
+                calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not, and continue with the program...
             }
         }
         else
@@ -489,7 +492,7 @@ public:
 
         while (std::getline(dateSearchForBook, field))
         {
-            std::vector<Book> book;
+            std::vector<Book> books;
             std::vector<std::string> fields;
             std::stringstream ss(field);
 
@@ -503,7 +506,7 @@ public:
                 Book book;
                 book.bookID = fields[0];
                 book.bookTitle = fields[1];
-                book.dateBorrowed = std::stoi(fields[6]); // Retrieve the date borrowed for the book
+                book.dateBorrowed = fields[6]; // Retrieve the date borrowed for the book
 
                 // Parse dateBorrowed into a std::tm structure
                 std::tm borrowTime = {};
@@ -516,8 +519,9 @@ public:
                 double secondsElapsed = difftime(currentTime, borrowTimestamp);
                 int daysElapsed = static_cast<int>(secondsElapsed / (60 * 60 * 24));
 
+                std::cout << daysElapsed; // Debugging
+
                 // Check if borrowing duration exceeds two weeks
-                const int MAX_BORROWING_DAYS = 14;
                 if (daysElapsed > MAX_BORROWING_DAYS)
                 {
                     double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
@@ -548,7 +552,6 @@ public:
 
                         while (std::getline(changeQuantity, field))
                         {
-                            std::vector<Book> books;
                             std::vector<std::string> fields;
                             std::stringstream ss(field);
 
@@ -559,39 +562,24 @@ public:
 
                             if (fields.size() >= 6)
                             {
-                                Book book;
-                                book.bookID = fields[0];
-                                book.bookTitle = fields[1];
-                                book.yearOfRelease = std::stoi(fields[2]);
-                                book.bookPublisher = fields[3];
-                                book.numberOfReleases = std::stoi(fields[4]);
-                                book.remainingBooks = std::stoi(fields[5]);
+                                int remainingBooks = std::stoi(fields[5]); // Convert remaining books to integer
+                                remainingBooks += 1; // Increment the value by '+1' as the book is being returned
 
-                                fields[5] += 1; // Increment the value by '+1' as the book is being returned
+                                fields[5] = std::to_string(remainingBooks); // Convert back to string and update
 
-                                books.push_back(book); // Acknowledge the changes
+                                std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
+
+                                // Append the changes to the '.csv' file via 'ofstream'
+                                for (const auto& field : fields)
+                                {
+                                    pushQuantityChange << field << ",";
+                                }
+                                pushQuantityChange << std::endl;
+
+                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                                std::cout << "\nPayment success!" << std::endl;
 
                             }
-
-                            std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
-
-                            // Append the changes to the '.csv' file via 'ofstream'
-                            for (const auto& book : books)
-                            {
-                                pushQuantityChange << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
-                                    << book.remainingBooks;
-                            }
-
-                            pushQuantityChange.close(); // Once changes are made, safely close the file to mitigate issues
-
-                            // Creation of a new file, or writing on this file should it already exist
-                            std::ofstream returnedBooks("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
-
-                            returnedBooks << name << "," << surname << "," << book.bookID << "," << book.bookTitle << "\n"; // Append the changes into the '.csv' file the '\n' is for every new return
-
-                            std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
-                            std::cout << "\nPayment success!" << std::endl;
-
                         }
 
                         // Delete the file that retains the book borrowing session of the users
