@@ -585,6 +585,15 @@ class user
                                     pushQuantityChange << book.bookID << "," << book.bookTitle << "," << book.yearOfRelease << "," << book.bookPublisher << "," << book.numberOfReleases << ","
                                         << book.remainingBooks;
                                 }
+                                
+                                pushQuantityChange.close(); // Once changes are made, safely close the file to mitigate issues
+
+                                // Creation of a new file, or writing on this file should it already exist
+                                std::ofstream("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
+
+
+
+                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
 
                             }
 
