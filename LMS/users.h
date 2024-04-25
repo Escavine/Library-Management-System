@@ -547,7 +547,6 @@ public:
                         std::cout << "\nReturning book..." << std::endl; // Delete the file that keeps the record of the book borrowing session
 
                         // Create a book return record and update the quantity of the following book by '+1'
-
                         std::string line;
 
                         while (std::getline(changeQuantity, field))
@@ -576,9 +575,8 @@ public:
                                 }
                                 pushQuantityChange << std::endl;
 
-                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
                                 std::cout << "\nPayment success!" << std::endl;
-
+                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
                             }
                         }
 
@@ -602,6 +600,64 @@ public:
                         system("CLS"); // Clear the console
 
                         calculatingFine(name, surname, x); // Recurse
+                    }
+                }
+                else
+                {
+                    // Should the book be returned in 2 weeks or less...
+                    std::cout << "\nBook has not been borrowed for over 2 weeks, so no fines will be charged." << std::endl;
+                    std::cout << "\nProcessing return..." << std::endl;
+
+                    std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds...
+
+                    // Process the return 
+
+                    std::ifstream changeQuantity(book.bookID + ".csv");
+
+                    // Create a book return record and update the quantity of the following book by '+1'
+                    std::string line;
+
+                    while (std::getline(changeQuantity, field))
+                    {
+                        std::vector<std::string> fields;
+                        std::stringstream ss(field);
+
+                        while (std::getline(ss, field, ','))
+                        {
+                            fields.push_back(field); // Append the fields in the file
+                        }
+
+                        if (fields.size() >= 6)
+                        {
+                            int remainingBooks = std::stoi(fields[5]); // Convert remaining books to integer
+                            remainingBooks += 1; // Increment the value by '+1' as the book is being returned
+
+                            fields[5] = std::to_string(remainingBooks); // Convert back to string and update
+
+                            std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
+
+                            // Append the changes to the '.csv' file via 'ofstream'
+                            for (const auto& field : fields)
+                            {
+                                pushQuantityChange << field << ",";
+                            }
+                            pushQuantityChange << std::endl;
+
+                            std::cout << "\nPayment success!" << std::endl;
+                            std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                        }
+                    }
+
+                    // Delete the file that retains the book borrowing session of the users
+                    std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
+
+                    if (remove(filename.c_str()) != 0)
+                    {
+                        std::perror("Error deleting borrow session file");
+                    }
+                    else
+                    {
+                        std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
                     }
                 }
             }
