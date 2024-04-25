@@ -481,7 +481,6 @@ class user
             char currentDate[100];
             strftime(currentDate, sizeof(currentDate), "%d/%m/%Y", localtime(&currentTime));
 
-
             // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
 
             std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
@@ -505,7 +504,6 @@ class user
                     book.bookID = fields[0];
                     book.bookTitle = fields[1];
                     book.dateBorrowed = std::stoi(fields[6]); // Retrieve the date borrowed for the book
-
 
                     // Parse dateBorrowed into a std::tm structure
                     std::tm borrowTime = {};
@@ -575,8 +573,6 @@ class user
                                         
                                 } 
 
-                                changeQuantity.close(); // Close the given file once modifications have been made
-
                                 std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
 
                                 // Append the changes to the '.csv' file via 'ofstream'
@@ -589,9 +585,9 @@ class user
                                 pushQuantityChange.close(); // Once changes are made, safely close the file to mitigate issues
 
                                 // Creation of a new file, or writing on this file should it already exist
-                                std::ofstream("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
+                                std::ofstream returnedBooks("ReturnedBooks.csv", std::ios::app); // This '.csv' file will retain the returned book details which can exclusively be viewed by staff members for all books that have been returned
 
-
+                                returnedBooks << name << "," << surname << "," << book.bookID << "," << book.bookTitle << "\n"; // Append the changes into the '.csv' file the '\n' is for every new return
 
                                 std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
 
