@@ -506,7 +506,7 @@ public:
                 Book book;
                 book.bookID = fields[0];
                 book.bookTitle = fields[1];
-                book.dateBorrowed = fields[6]; // Retrieve the date borrowed for the book
+                book.dateBorrowed = fields[5]; // Retrieve the date borrowed for the book
 
                 // Parse dateBorrowed into a std::tm structure
                 std::tm borrowTime = {};
@@ -519,22 +519,22 @@ public:
                 double secondsElapsed = difftime(currentTime, borrowTimestamp);
                 int daysElapsed = static_cast<int>(secondsElapsed / (60 * 60 * 24));
 
-                std::cout << daysElapsed; // Debugging
-
                 // Check if borrowing duration exceeds two weeks
                 if (daysElapsed > MAX_BORROWING_DAYS)
                 {
-                    double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS);
+                    double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS); // Calculate the fine
+
+                    std::cout << "\nBook overdue for: " << daysElapsed << std::endl; // Display the number of days that the book was overdue for...
+
                     std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
 
-                    std::cout << "\nHow would you like to pay for your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
+                    std::cout << "\nHow would you like to pay your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
 
                     std::cout << "\n1. Cash" << std::endl;
                     std::cout << "\n2. Card" << std::endl;
 
                     std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
                     std::cin >> userChoice; // Register user input
-
 
                     std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
 
@@ -643,7 +643,6 @@ public:
                             }
                             pushQuantityChange << std::endl;
 
-                            std::cout << "\nPayment success!" << std::endl;
                             std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
                         }
                     }
