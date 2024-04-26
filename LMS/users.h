@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <cstdio>
 #include <fstream>
+#include <filesystem>
 
 const int MAX_FILES_TO_CHECK = 100; // Will be used to check for number of books borrowed, and '100' is the set limit
 const int MAX_BORROWING_DAYS = 14; // Max borrowing days is set to '14' (2 weeks)
@@ -435,6 +436,15 @@ public:
 
         std::cout << "\nNumber of currently borrowed books: " << borrowedBooksCount << std::endl;
 
+        if (borrowedBooksCount == 0)
+        {
+            std::cout << "\nUser has no books to return..." << std::endl;
+
+            std::cout << "\nTerminating process..." << std::endl;
+
+            exit(1); // Exit the program
+        }
+
         std::cout << "\nEnter the number of the book you'd like to return (i.e. the first book, then 1, the second book 2 etc...): ";
         std::cin >> userChoice;
 
@@ -468,10 +478,10 @@ public:
 
                 std::cout << "\n"; // Spacing
 
+                file.close();
                 calculatingFine(name, surname, std::stoi(userChoice)); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not, and continue with the program...
             }
 
-            file.close();
         }
         else
         {
@@ -503,10 +513,10 @@ public:
             // Handle the error, possibly by returning from the function or taking appropriate action
             return; // For example, return from the function to avoid further processing
         }
-        else
-        {
-            std::cout << "Successfully opened file for reading (CHECK 1)" << std::endl;
-        }
+        // else
+        // {
+            // std::cout << "Successfully opened file for reading" << std::endl;
+        // }
 
 
         std::ifstream currentFileDate("CurrentDate.csv"); // File that contains the current date
@@ -523,7 +533,7 @@ public:
 
             if (iss >> currentDateInfo.day >> delimiter >> currentDateInfo.month >> delimiter >> currentDateInfo.year)
             {
-                std::cout << "Current date: " << currentDateStr << " (CHECK 2)" << std::endl; // Display the current date to the user
+                std::cout << "Current date: " << currentDateStr << std::endl; // Display the current date to the user
             }
             else
             {
@@ -594,7 +604,7 @@ public:
                     std::cout << "\n1. Cash" << std::endl;
                     std::cout << "2. Card" << std::endl;
 
-                    std::cout << "\nEnter a corresponding value (CHECK 3): "; // Allow user to register their choice for the options displayed
+                    std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
                     std::cin >> userChoice; // Register user input
 
                     std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
@@ -661,11 +671,11 @@ public:
                         }
                         else {
                             // DEBUGGING MEASURES
-                            std::cout << "\nDebugging Measures (CHECK 4)\n" << std::endl;
-                            std::cout << "Book ID: " << book.bookID << "\n";
-                            std::cout << "Book Title: " << book.bookTitle << "\n";
-                            std::cout << "Days Overdue: " << actualDays << "\n";
-                            std::cout << "Fine: " << fine << "\n";
+                            // std::cout << "\nDebugging Measures\n" << std::endl;
+                            // std::cout << "Book ID: " << book.bookID << "\n";
+                            // std::cout << "Book Title: " << book.bookTitle << "\n";
+                            // std::cout << "Days Overdue: " << actualDays << "\n";
+                            // std::cout << "Fine: " << fine << "\n";
 
                             // Write data to the file
                             returnRecords << book.bookID << "," << book.bookTitle << "," << actualDays << "," << fine << std::endl;
@@ -679,23 +689,22 @@ public:
                             // Close the file
                             returnRecords.close();
                         }
-                         
-                        // Delete the file that retains the book borrowing session of the users
-                        std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
-                        if (remove(filename.c_str()) != 0)
-                        {
-                            std::perror("\nError deleting borrow session file (CHECK 5: FAILED)");
-                            std::cerr << "\nFailed to delete " << filename << std::endl;
+                        dateSearchForBook.close(); // Close the file once done used, to prevent it being used by another process
+
+                        std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
+                        
+                        std::string command = "del " + filename; // Command to delete file 
+                        int result = std::system(command.c_str());
+                        if (result == 0) {
+                            std::cout << "Book return success!" << std::endl;
                         }
-                        else
-                        {
-                            std::cout << "Successfully deleted borrow session file! (CHECK 5: SUCCESS)" << std::endl; // Let the user know that their borrow session has been removed after payment
+                        else {
+                            std::cerr << "Error returning book, please check code." << std::endl;
                         }
 
                         pushQuantityChange.close(); // Close the output file
                         changeQuantity.close(); // Close the input file
-                        dateSearchForBook.close(); // Close the file once done used
                     }
                     else
                     {
@@ -766,23 +775,22 @@ public:
                     changeQuantity.close();
                     pushQuantityChange.close(); // Close the output file
 
-                    std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
-
                     // Creation/Writing (if it already exists) of a '.csv' file named returned records, which will contain the book that's returned along with the fine cost, and overdue date for the book returned.
                     std::ofstream returnRecords("ReturnRecords.csv", std::ios::app);
 
                     returnRecords << book.bookID << "," << book.bookTitle << "," << daysElapsed << "," << 0 << "\n"; // Append the following information to the file (writing)
 
-                    // Delete the file that retains the book borrowing session of the users
+                    dateSearchForBook.close(); // Close the file to prevent it from being used by another process
+
                     std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
-                    if (remove(filename.c_str()) != 0)
-                    {
-                        std::perror("Error deleting borrow session file");
+                    std::string command = "del " + filename; // Command to delete file 
+                    int result = std::system(command.c_str());
+                    if (result == 0) {
+                        std::cout << "Book return success!" << std::endl;
                     }
-                    else
-                    {
-                        std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
+                    else {
+                        std::cerr << "Error returning book, please check code." << std::endl;
                     }
 
                     break;
