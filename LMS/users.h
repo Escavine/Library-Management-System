@@ -488,10 +488,16 @@ public:
 
         std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
 
+        std::ifstream currentFileDate("CurrentDate.csv"); // File that contains the current date
+
         std::string field;
 
         while (std::getline(dateSearchForBook, field))
         {
+
+
+            while (std::getline)
+
             std::vector<Book> books;
             std::vector<std::string> fields;
             std::stringstream ss(field);
