@@ -319,27 +319,8 @@ public:
                 }
                 else
                 {
-                    std::string userChoice;
-                    std::cout << "\nWould you like to borrow another book or return to the dashboard? (1 for 'to borrow' and any other key for the dashboard): ";
-                    std::getline(std::cin, userChoice); // Retrieve user input
-
-                    if (userChoice == "1")
-                    {
-                        std::cout << "\nRedirecting user to borrow another book..." << std::endl;
-                        std::this_thread::sleep_for(std::chrono::seconds(3));
-                        system("CLS");
-                        clearInputBuffer();
-                        borrowBook(individual, name, surname);
-                    }
-                    else
-                    {
-                        std::cout << "\nRedirecting user to the dashboard..." << std::endl;
-                        std::this_thread::sleep_for(std::chrono::seconds(3));
-                        system("CLS");
-                        clearInputBuffer();
-
-                        // Check if the user is a 'librarian' or 'student'
-                    }
+                    std::cout << "\nTerminating session...";
+                    exit(1);
                 }
 
             }
