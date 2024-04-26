@@ -3,6 +3,8 @@
 // All relevant libraries
 #include <chrono>
 #include <iomanip>
+#include <cstdio>
+#include <fstream>
 
 const int MAX_FILES_TO_CHECK = 100; // Will be used to check for number of books borrowed, and '100' is the set limit
 const int MAX_BORROWING_DAYS = 14; // Max borrowing days is set to '14' (2 weeks)
@@ -468,6 +470,8 @@ public:
 
                 calculatingFine(name, surname, std::stoi(userChoice)); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not, and continue with the program...
             }
+
+            file.close();
         }
         else
         {
@@ -579,19 +583,22 @@ public:
                 {
                     double fine = 0.20 * (daysElapsed - MAX_BORROWING_DAYS); // Calculate the fine
 
-                    std::cout << "\nBook overdue for: " << daysElapsed << std::endl; // Display the number of days that the book was overdue for...
+                    int actualDays = daysElapsed - MAX_BORROWING_DAYS; // Figure out the difference in the days to give the user a proper measure of the actual days the book is overdue for...
+
+                    std::cout << "\nBook overdue for: " << actualDays << " day/days" << std::endl; // Display the number of days that the book was overdue for...
 
                     std::cout << "\nFine for book \"" << book.bookTitle << "\" (ID: " << book.bookID << "): " << fine << "p" << std::endl;
 
                     std::cout << "\nHow would you like to pay your fine? ('1' for 'cash' and '2' for 'card')" << std::endl;
 
                     std::cout << "\n1. Cash" << std::endl;
-                    std::cout << "\n2. Card" << std::endl;
+                    std::cout << "2. Card" << std::endl;
 
                     std::cout << "\nEnter a corresponding value (CHECK 3): "; // Allow user to register their choice for the options displayed
                     std::cin >> userChoice; // Register user input
 
                     std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
+
 
                     if (userChoice == "1" || userChoice == "2")
                     {
@@ -603,6 +610,7 @@ public:
 
                         // Create a book return record and update the quantity of the following book by '+1'
                         std::string line;
+                        std::vector<std::string> updatedLines; // Store updated lines
 
                         while (std::getline(changeQuantity, field))
                         {
@@ -621,26 +629,47 @@ public:
 
                                 fields[5] = std::to_string(remainingBooks); // Convert back to string and update
 
-                                std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
-
-                                // Append the changes to the '.csv' file via 'ofstream'
-                                for (const auto& field : fields)
+                                std::stringstream updatedLine;
+                                for (size_t i = 0; i < fields.size(); ++i)
                                 {
-                                    pushQuantityChange << field << ",";
+                                    updatedLine << fields[i];
+                                    if (i < fields.size() - 1)
+                                    {
+                                        updatedLine << ','; // Add delimiter if it's not the last field
+                                    }
                                 }
-                                pushQuantityChange << std::endl;
 
-                                std::cout << "\nPayment success!" << std::endl;
-                                std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                                updatedLines.push_back(updatedLine.str()); // Store the updated line
                             }
                         }
 
+                        changeQuantity.close(); // Close the input file
+
+                        std::ofstream pushQuantityChange(book.bookID + ".csv"); // Open the output file
+
+                        // Write all updated lines to the output file
+                        for (const auto& line : updatedLines)
+                        {
+                            pushQuantityChange << line << std::endl;
+                        }
+
+                        pushQuantityChange.close(); // Close the output file
+                    
+
+                        // Creation/Writing (if it already exists) of a '.csv' file named returned records, which will contain the book that's returned along with the fine cost, and overdue date for the book returned.
+                        std::ofstream returnRecords("ReturnRecords.csv", std::ios::app);
+
+                        returnRecords << book.bookID << "," << book.bookTitle << "," << daysElapsed << "," << fine << "\n"; // Append the following information to the file (writing)
+
+                        dateSearchForBook.close(); // Close the file once done used
+                         
                         // Delete the file that retains the book borrowing session of the users
                         std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
                         if (remove(filename.c_str()) != 0)
                         {
                             std::perror("Error deleting borrow session file");
+                            std::cerr << "\nFailed to delete " << filename << std::endl;
                         }
                         else
                         {
@@ -666,11 +695,13 @@ public:
                     std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds...
 
                     // Process the return 
-
+                    
                     std::ifstream changeQuantity(book.bookID + ".csv");
+                    std::vector<std::string> linesToUpdate; // To store all lines with updates
 
                     // Create a book return record and update the quantity of the following book by '+1'
                     std::string line;
+                    std::vector<std::string> updatedLines; // Store updated lines
 
                     while (std::getline(changeQuantity, field))
                     {
@@ -689,18 +720,38 @@ public:
 
                             fields[5] = std::to_string(remainingBooks); // Convert back to string and update
 
-                            std::ofstream pushQuantityChange(book.bookID + ".csv"); // This will use 'ofstream' to write the changes onto the file
-
-                            // Append the changes to the '.csv' file via 'ofstream'
-                            for (const auto& field : fields)
+                            std::stringstream updatedLine;
+                            for (size_t i = 0; i < fields.size(); ++i)
                             {
-                                pushQuantityChange << field << ",";
+                                updatedLine << fields[i];
+                                if (i < fields.size() - 1)
+                                {
+                                    updatedLine << ','; // Add delimiter if it's not the last field
+                                }
                             }
-                            pushQuantityChange << std::endl;
 
-                            std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+                            updatedLines.push_back(updatedLine.str()); // Store the updated line
                         }
                     }
+
+                    changeQuantity.close(); // Close the input file
+
+                    std::ofstream pushQuantityChange(book.bookID + ".csv"); // Open the output file
+
+                    // Write all updated lines to the output file
+                    for (const auto& line : updatedLines)
+                    {
+                        pushQuantityChange << line << std::endl;
+                    }
+
+                    pushQuantityChange.close(); // Close the output file
+
+                    std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
+
+                    // Creation/Writing (if it already exists) of a '.csv' file named returned records, which will contain the book that's returned along with the fine cost, and overdue date for the book returned.
+                    std::ofstream returnRecords("ReturnRecords.csv", std::ios::app);
+
+                    returnRecords << book.bookID << "," << book.bookTitle << "," << daysElapsed << "," << 0 << "\n"; // Append the following information to the file (writing)
 
                     // Delete the file that retains the book borrowing session of the users
                     std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
