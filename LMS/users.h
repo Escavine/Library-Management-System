@@ -424,7 +424,8 @@ public:
 
         for (x; x <= MAX_FILES_TO_CHECK; ++x) {
             std::ifstream checkExistingFile(name + "_" + surname + "_" + std::to_string(x) + ".csv");
-            if (checkExistingFile.is_open()) {
+            if (checkExistingFile.is_open()) 
+            {
                 borrowedBooksCount++;
                 checkExistingFile.close();
             }
@@ -453,11 +454,11 @@ public:
                     fields.push_back(field);
                 }
 
-                for (int x = 0; x < order.size();)
+                for (int y = 0; y < order.size();)
                 {
                     for (int i = 0; i < fields.size();) {
-                        std::cout << order[x] << fields[i] << " ";
-                        x += 1;
+                        std::cout << order[y] << fields[i] << " ";
+                        y += 1;
                         i += 1;
                         std::cout << "\n";
                     }
@@ -465,7 +466,7 @@ public:
 
                 std::cout << "\n"; // Spacing
 
-                calculatingFine(name, surname, x); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not, and continue with the program...
+                calculatingFine(name, surname, std::stoi(userChoice)); // Execute the given function to see whether the user has borrowed the book for over 2 weeks or not, and continue with the program...
             }
         }
         else
@@ -493,6 +494,17 @@ public:
 
         std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
 
+        if (!dateSearchForBook.is_open()) {
+            std::cerr << "Error: Unable to open file for reading." << std::endl;
+            // Handle the error, possibly by returning from the function or taking appropriate action
+            return; // For example, return from the function to avoid further processing
+        }
+        else
+        {
+            std::cout << "Successfully opened file for reading (CHECK 1)" << std::endl;
+        }
+
+
         std::ifstream currentFileDate("CurrentDate.csv"); // File that contains the current date
 
         std::string field;
@@ -507,7 +519,7 @@ public:
 
             if (iss >> currentDateInfo.day >> delimiter >> currentDateInfo.month >> delimiter >> currentDateInfo.year)
             {
-                std::cout << "Current date: " << currentDateStr << std::endl; // Display the current date to the user
+                std::cout << "Current date: " << currentDateStr << " (CHECK 2)" << std::endl; // Display the current date to the user
             }
             else
             {
@@ -533,7 +545,7 @@ public:
                 fields.push_back(field); // Append the fields in the file
             }
 
-            if (fields.size() >= 7)
+            if (fields.size() >= 6)
             {
                 Book book;
                 book.bookID = fields[0];
@@ -576,7 +588,7 @@ public:
                     std::cout << "\n1. Cash" << std::endl;
                     std::cout << "\n2. Card" << std::endl;
 
-                    std::cout << "\nEnter a corresponding value: "; // Allow user to register their choice for the options displayed
+                    std::cout << "\nEnter a corresponding value (CHECK 3): "; // Allow user to register their choice for the options displayed
                     std::cin >> userChoice; // Register user input
 
                     std::ifstream changeQuantity(book.bookID + ".csv"); // Find the '.csv' file for the given book that was borrowed by the user
@@ -701,6 +713,8 @@ public:
                     {
                         std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
                     }
+
+                    break;
                 }
             }
         }
