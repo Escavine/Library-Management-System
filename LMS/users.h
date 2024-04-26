@@ -16,6 +16,13 @@ struct Book {
     int numberOfReleases, yearOfRelease, remainingBooks, quantityBorrowed;
 };
 
+struct date
+{
+    int day;
+    int month;
+    int year;
+};
+
 struct studentlogin {
     std::string name, surname, username, password;
 };
@@ -491,12 +498,27 @@ public:
         std::ifstream currentFileDate("CurrentDate.csv"); // File that contains the current date
 
         std::string field;
+        std::string dateField;
 
         while (std::getline(dateSearchForBook, field))
         {
 
+            while (std::getline(currentFileDate, dateField))
+            {
+                std::vector<std::string> dateFields;
+                std::stringstream ss(dateField);
 
-            while (std::getline)
+                while (std::getline(dateFields, dateField))
+                {
+                    dateFields.push_back(dateField); // Push back the current date into the vector
+                }
+
+                if (dateFields.size() >= 1)
+                {
+                    date retrieveDate;
+                    retrieveDate.date = dateFields[0]; // Retrieve the date and place it into the 'date' variable 
+                }
+            }
 
             std::vector<Book> books;
             std::vector<std::string> fields;
