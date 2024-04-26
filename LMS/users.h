@@ -491,40 +491,44 @@ public:
         char currentDate[100];
         strftime(currentDate, sizeof(currentDate), "%d/%m/%Y", localtime(&currentTime));
 
-        // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
-
         std::ifstream dateSearchForBook(name + "_" + surname + "_" + std::to_string(x) + ".csv"); // Open the following file
 
         std::ifstream currentFileDate("CurrentDate.csv"); // File that contains the current date
 
         std::string field;
-        std::string dateField;
+
+        std::string currentDateStr;
+
+        if (std::getline(currentFileDate, currentDateStr))
+        {
+            std::istringstream iss(currentDateStr);
+            date currentDateInfo;
+            char delimiter;
+
+            if (iss >> currentDateInfo.day >> delimiter >> currentDateInfo.month >> delimiter >> currentDateInfo.year)
+            {
+                std::cout << "Current date: " << currentDateStr << std::endl; // Display the current date to the user
+            }
+            else
+            {
+                std::cout << "\nInvalid date format contained within the CurrentDate.csv file." << std::endl;
+            }
+
+        }
+        else
+        {
+            std::cout << "Error: CurrentDate.csv does not exist." << std::endl;
+        }
+
+
+        // Logic to check if the following book has been borrowed for over 2 weeks (borrowing limit is 2 weeks, each day that is exceeded is an added 0.20p charge)
 
         while (std::getline(dateSearchForBook, field))
         {
-
-            while (std::getline(currentFileDate, dateField))
-            {
-                std::vector<std::string> dateFields;
-                std::stringstream ss(dateField);
-
-                while (std::getline(dateFields, dateField))
-                {
-                    dateFields.push_back(dateField); // Push back the current date into the vector
-                }
-
-                if (dateFields.size() >= 1)
-                {
-                    date retrieveDate;
-                    retrieveDate.date = dateFields[0]; // Retrieve the date and place it into the 'date' variable 
-                }
-            }
-
-            std::vector<Book> books;
             std::vector<std::string> fields;
-            std::stringstream ss(field);
+            std::istringstream iss(field);
 
-            while (std::getline(ss, field, ','))
+            while (std::getline(iss, field, ','))
             {
                 fields.push_back(field); // Append the fields in the file
             }
@@ -536,14 +540,25 @@ public:
                 book.bookTitle = fields[1];
                 book.dateBorrowed = fields[5]; // Retrieve the date borrowed for the book
 
-                // Parse dateBorrowed into a std::tm structure
-                std::tm borrowTime = {};
-                std::istringstream(book.dateBorrowed) >> std::get_time(&borrowTime, "%d/%m/%Y");
+                std::istringstream dateStream(book.dateBorrowed);
+                date borrowDate;
+                char delimiter;
 
-                // Convert std::tm structure to time_t
+                if (!(dateStream >> borrowDate.day >> delimiter >> borrowDate.month >> delimiter >> borrowDate.year))
+                {
+                    std::cout << "\nError: Invalid date format in the borrowed book file." << std::endl;
+                    continue;
+                }
+
+                // Calculate the difference between the two dates
+
+                std::tm borrowTime = { 0 };
+                borrowTime.tm_mday = borrowDate.day;
+                borrowTime.tm_mon = borrowDate.month - 1; // Months are zero based
+                borrowTime.tm_year = borrowDate.year - 1900; // Year is years since 1900
+                
                 time_t borrowTimestamp = mktime(&borrowTime);
 
-                // Calculate borrowing duration in days
                 double secondsElapsed = difftime(currentTime, borrowTimestamp);
                 int daysElapsed = static_cast<int>(secondsElapsed / (60 * 60 * 24));
 
