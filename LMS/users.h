@@ -643,8 +643,6 @@ public:
                             }
                         }
 
-                        changeQuantity.close(); // Close the input file
-
                         std::ofstream pushQuantityChange(book.bookID + ".csv"); // Open the output file
 
                         // Write all updated lines to the output file
@@ -652,29 +650,52 @@ public:
                         {
                             pushQuantityChange << line << std::endl;
                         }
-
-                        pushQuantityChange.close(); // Close the output file
                     
-
-                        // Creation/Writing (if it already exists) of a '.csv' file named returned records, which will contain the book that's returned along with the fine cost, and overdue date for the book returned.
+                        // Open the file in append mode
                         std::ofstream returnRecords("ReturnRecords.csv", std::ios::app);
 
-                        returnRecords << book.bookID << "," << book.bookTitle << "," << daysElapsed << "," << fine << "\n"; // Append the following information to the file (writing)
+                        // Check if the file is opened successfully
+                        if (!returnRecords.is_open()) {
+                            std::cerr << "Error: Unable to open ReturnRecords.csv for writing." << std::endl;
+                            // Handle the error appropriately, such as returning from the function
+                        }
+                        else {
+                            // DEBUGGING MEASURES
+                            std::cout << "\nDebugging Measures (CHECK 4)\n" << std::endl;
+                            std::cout << "Book ID: " << book.bookID << "\n";
+                            std::cout << "Book Title: " << book.bookTitle << "\n";
+                            std::cout << "Days Overdue: " << actualDays << "\n";
+                            std::cout << "Fine: " << fine << "\n";
 
-                        dateSearchForBook.close(); // Close the file once done used
+                            // Write data to the file
+                            returnRecords << book.bookID << "," << book.bookTitle << "," << actualDays << "," << fine << std::endl;
+
+                            // Check for any errors during write operation
+                            if (!returnRecords) {
+                                std::cerr << "Error: Failed to write data to ReturnRecords.csv." << std::endl;
+                                // Handle the error appropriately, such as returning from the function
+                            }
+
+                            // Close the file
+                            returnRecords.close();
+                        }
                          
                         // Delete the file that retains the book borrowing session of the users
                         std::string filename = name + "_" + surname + "_" + std::to_string(x) + ".csv";
 
                         if (remove(filename.c_str()) != 0)
                         {
-                            std::perror("Error deleting borrow session file");
+                            std::perror("\nError deleting borrow session file (CHECK 5: FAILED)");
                             std::cerr << "\nFailed to delete " << filename << std::endl;
                         }
                         else
                         {
-                            std::cout << "Successfully deleted borrow session file!" << std::endl; // Let the user know that their borrow session has been removed after payment
+                            std::cout << "Successfully deleted borrow session file! (CHECK 5: SUCCESS)" << std::endl; // Let the user know that their borrow session has been removed after payment
                         }
+
+                        pushQuantityChange.close(); // Close the output file
+                        changeQuantity.close(); // Close the input file
+                        dateSearchForBook.close(); // Close the file once done used
                     }
                     else
                     {
@@ -734,8 +755,6 @@ public:
                         }
                     }
 
-                    changeQuantity.close(); // Close the input file
-
                     std::ofstream pushQuantityChange(book.bookID + ".csv"); // Open the output file
 
                     // Write all updated lines to the output file
@@ -744,6 +763,7 @@ public:
                         pushQuantityChange << line << std::endl;
                     }
 
+                    changeQuantity.close();
                     pushQuantityChange.close(); // Close the output file
 
                     std::cout << "\nBook successfully returned!" << std::endl; // Tell the user that the changes have been made
@@ -1181,7 +1201,7 @@ class librarian : user // Librarian inherits properties of a user
         {
             std::string userChoice;
 
-            std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Student registering", "Terminate Session" }; // Vector of string options
+            std::vector <std::string> dashboardOptions = { "Register a book", "Borrow a book", "Return a book", "Student registering", "Check return records", "Terminate Session" }; // Vector of string options
             // int maxSize = dashboardOptions.max_size(); Determine the maximum value of the 
 
             int numCount = 1;
@@ -1269,6 +1289,65 @@ class librarian : user // Librarian inherits properties of a user
                 staff.librarianDashboard(staff, name, surname); // Return to dashboard
             }
             else if (userChoice == "5")
+            {
+                std::cout << "\nRedirecting user..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds for transfer
+                system("CLS"); // Clear the console
+
+                std::cout << "Stepwise University: Returned Books\n" << std::endl;
+
+                std::ifstream checkReturnRecords("ReturnRecords.csv");
+
+                if (!checkReturnRecords) // Check if the file actually exists within the directory
+                {
+                    std::cerr << "\nReturn records doesn't exist, no books have been returned." << std::endl;
+                }
+
+                // Otherwise display all return information for the returned books
+
+                std::string field;
+                std::vector<std::string> fields;
+
+                while (std::getline(checkReturnRecords, field))
+                {
+                    std::stringstream ss(field);
+
+                    while (std::getline(ss, field, ','))
+                    {
+                        fields.push_back(field);
+                    }
+
+                    std::vector<std::string> order = { "Book ID: ", "Book Name: ", "Day/Days Overdue: ", "Amount Charged: " }; // Contains all relevant information for returned book information
+
+                    if (fields.size() == order.size())
+                    {
+                        Book book;
+                        book.bookID = fields[0];
+                        book.bookTitle = fields[1];
+                        std::string daysOverdue = fields[2];
+                        std::string amountCharged = fields[3] + "p";
+
+                        for (int i = 0; i < order.size(); ++i)
+                        {
+                            std::cout << order[i] << fields[i] << "\n"; // Display all return books information
+                        }
+
+                        std::cout << std::endl;
+
+                    }
+                }
+
+                std::cout << "If that is all clear, press any key to return to the dashboard." << std::endl;
+
+                system("\npause"); // Register user input
+
+                std::cout << "\nRedirecting user..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait 3 seconds before sending user to dashboard       
+                system("CLS"); // Clear console
+
+                staff.librarianDashboard(staff, name, surname); // Return
+            }
+            else if (userChoice == "6")
             {
                 std::cout << "\nTerminating user session...." << std::endl;
                 exit(1); // Terminate the console 
