@@ -1300,6 +1300,7 @@ class librarian : user // Librarian inherits properties of a user
                 while (std::getline(checkReturnRecords, field))
                 {
                     std::stringstream ss(field);
+                    fields.clear(); // Clear fields vector before reading new line
 
                     while (std::getline(ss, field, ','))
                     {
